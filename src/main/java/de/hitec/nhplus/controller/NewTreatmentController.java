@@ -14,6 +14,7 @@ import javafx.util.StringConverter;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class NewTreatmentController {
 
@@ -44,6 +45,7 @@ public class NewTreatmentController {
     private AllTreatmentController controller;
     private Patient patient;
     private Stage stage;
+    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
     public void initialize(AllTreatmentController controller, Stage stage, Patient patient) {
         this.controller= controller;
@@ -54,7 +56,8 @@ public class NewTreatmentController {
         ChangeListener<String> inputNewPatientListener = (observableValue, oldText, newText) ->
                 NewTreatmentController.this.buttonAdd.setDisable(NewTreatmentController.this.areInputDataInvalid());
         this.textFieldBegin.textProperty().addListener(inputNewPatientListener);
-        this.textFieldEnd.textProperty().addListener(inputNewPatientListener);
+        textFieldEnd.setText(LocalTime.now().format(timeFormatter));
+        textFieldEnd.textProperty().addListener(inputNewPatientListener);
         this.textFieldDescription.textProperty().addListener(inputNewPatientListener);
         this.textAreaRemarks.textProperty().addListener(inputNewPatientListener);
         this.datePicker.valueProperty().addListener((observableValue, localDate, t1) -> NewTreatmentController.this.buttonAdd.setDisable(NewTreatmentController.this.areInputDataInvalid()));
@@ -69,6 +72,9 @@ public class NewTreatmentController {
                 return DateConverter.convertStringToLocalDate(localDate);
             }
         });
+
+        // Default-Datum setzen
+        datePicker.setValue(LocalDate.now());
         this.showPatientData();
     }
 
