@@ -25,13 +25,15 @@
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0"/>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0"/>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0"/>
+
+
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+
             </rowConstraints>
             <children>
                 <Label text="Vorname:">
@@ -44,34 +46,42 @@
                         <Font name="System Bold" size="13.0"/>
                     </font>
                 </Label>
-                <Label text="Datum:" GridPane.rowIndex="3">
+                <Label text="Datum:" GridPane.rowIndex="1">
                     <font>
                         <Font name="System Bold" size="13.0"/>
                     </font>
                 </Label>
-                <Label text="Beginn:" GridPane.columnIndex="2" GridPane.rowIndex="3">
+
+                <Label text="Beginn:" GridPane.columnIndex="2" GridPane.rowIndex="1">
                     <font>
                         <Font name="System Bold" size="13.0"/>
                     </font>
                 </Label>
-                <Label text="Ende" GridPane.rowIndex="4">
+                <Label text="Ende" GridPane.rowIndex="2">
                     <font>
                         <Font name="System Bold" size="13.0"/>
                     </font>
                 </Label>
-                <Label text="Beschreibung:" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                <Label text="Beschreibung:" GridPane.columnIndex="2" GridPane.rowIndex="2">
                     <font>
                         <Font name="System Bold" size="13.0"/>
                     </font>
                 </Label>
-                <TextField fx:id="textFieldBegin" promptText="hh:mm" GridPane.columnIndex="3" GridPane.rowIndex="3"/>
+                <Label text="Pflegekraft:" GridPane.rowIndex="3" GridPane.columnIndex="0">
+                    <font>
+                        <Font name="System Bold" size="13.0"/>
+                    </font>
+                </Label>
+
+                <TextField fx:id="textFieldBegin" promptText="hh:mm" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
                 <TextField fx:id="textFieldEnd" maxWidth="192.0" prefWidth="150.0" promptText="hh:mm"
-                           GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-                <TextField fx:id="textFieldDescription" GridPane.columnIndex="3" GridPane.rowIndex="4"/>
+                           GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <TextField fx:id="textFieldDescription" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
                 <DatePicker fx:id="datePicker" prefWidth="192.0" promptText="yyyy-mm-dd" GridPane.columnIndex="1"
-                            GridPane.rowIndex="3"/>
+                            GridPane.rowIndex="1"/>
                 <Label fx:id="labelFirstName" text="Vorname" GridPane.columnIndex="1"/>
                 <Label fx:id="labelSurname" text="Nachname" GridPane.columnIndex="3"/>
+                <ComboBox fx:id="comboBoxNurseSelection" styleClass="comboBox" promptText="Pflegekraft" GridPane.columnIndex="1" GridPane.rowIndex="3" minWidth="160.0" prefWidth="200.0"/>
             </children>
         </GridPane>
         <HBox layoutX="298.0" layoutY="237.0" spacing="20.0" AnchorPane.bottomAnchor="20.0"
