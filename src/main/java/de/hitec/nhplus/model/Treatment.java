@@ -13,7 +13,16 @@ public class Treatment {
     private LocalTime end;
     private String description;
     private String remarks;
+    private long nid;
+    private String nurseName; // Anzeigezweck
 
+    public String getNurseName() {
+        return nurseName;
+    }
+
+    public void setNurseName(String nurseName) {
+        this.nurseName = nurseName;
+    }
     /**
      * Constructor to initiate an object of class <code>Treatment</code> with the given parameter. Use this constructor
      * to initiate objects, which are not persisted yet, because it will not have a treatment id (tid).
@@ -24,14 +33,17 @@ public class Treatment {
      * @param end         Time of the end of the treatment in format "hh:MM".
      * @param description Description of the treatment.
      * @param remarks     Remarks to the treatment.
+     * @param nid         Id of the nurse that did the treatment.
      */
-    public Treatment(long pid, LocalDate date, LocalTime begin, LocalTime end, String description, String remarks) {
+    public Treatment(long pid, LocalDate date, LocalTime begin, LocalTime end, String description, String remarks,
+                     long nid) {
         this.pid = pid;
         this.date = date;
         this.begin = begin;
         this.end = end;
         this.description = description;
         this.remarks = remarks;
+        this.nid = nid;
     }
 
     /**
@@ -45,9 +57,10 @@ public class Treatment {
      * @param end         Time of the end of the treatment in format "hh:MM".
      * @param description Description of the treatment.
      * @param remarks     Remarks to the treatment.
+     * @param nid         Id of the nurse that did the treatment
      */
     public Treatment(long tid, long pid, LocalDate date, LocalTime begin, LocalTime end, String description,
-                     String remarks) {
+                     String remarks, long nid) {
         this.tid = tid;
         this.pid = pid;
         this.date = date;
@@ -55,6 +68,7 @@ public class Treatment {
         this.end = end;
         this.description = description;
         this.remarks = remarks;
+        this.nid = nid;
     }
 
     public long getTid() {
@@ -63,6 +77,10 @@ public class Treatment {
 
     public long getPid() {
         return this.pid;
+    }
+
+    public long getNid() {
+        return nid;
     }
 
     public String getDate() {
@@ -110,6 +128,10 @@ public class Treatment {
     public String toString() {
         return "\nBehandlung" + "\nTID: " + this.tid + "\nPID: " + this.pid + "\nDate: " + this.date + "\nBegin: " +
                 this.begin + "\nEnd: " + this.end + "\nDescription: " + this.description + "\nRemarks: " +
-                this.remarks + "\n";
+                this.remarks + "\nNurse" + "\nNID:" + this.nid + "\n";
+    }
+
+    public void setNid(long nid) {
+
     }
 }
