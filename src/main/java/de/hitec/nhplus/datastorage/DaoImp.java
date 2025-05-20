@@ -1,5 +1,6 @@
 package de.hitec.nhplus.datastorage;
 
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,11 @@ public abstract class DaoImp<T> implements Dao<T> {
         getDeleteStatement(key).executeUpdate();
     }
 
+    @Override
+    public void deactivateById(long key) throws SQLException{
+        getDeactivateStatement(key).executeUpdate();
+    }
+
     protected abstract T getInstanceFromResultSet(ResultSet set) throws SQLException;
 
     protected abstract ArrayList<T> getListFromResultSet(ResultSet set) throws SQLException;
@@ -54,4 +60,8 @@ public abstract class DaoImp<T> implements Dao<T> {
     protected abstract PreparedStatement getUpdateStatement(T t);
 
     protected abstract PreparedStatement getDeleteStatement(long key);
+
+    protected abstract PreparedStatement getDeactivateStatement(long key);
+
+    protected abstract PreparedStatement setDeleteDateStatement(long key);
 }

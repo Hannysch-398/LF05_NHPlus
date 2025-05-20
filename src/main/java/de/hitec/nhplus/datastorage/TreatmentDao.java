@@ -209,4 +209,14 @@ public class TreatmentDao extends DaoImp<Treatment> {
         }
         return preparedStatement;
     }
+
+    @Override
+    protected PreparedStatement getDeactivateStatement(long key) {
+        return null;
+    }
+
+    @Override
+    protected PreparedStatement setDeleteDateStatement(long key) {
+        return null;
+    }
 }

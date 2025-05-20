@@ -59,7 +59,7 @@ public class AllTreatmentController {
     @FXML
     private Button buttonDelete;
 
-    private static final Logger LOG= LoggerFactory.getLogger(AllTreatmentController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AllTreatmentController.class);
     private final ObservableList<Treatment> treatments = FXCollections.observableArrayList();
     private TreatmentDao dao;
     private final ObservableList<String> patientSelection = FXCollections.observableArrayList();
@@ -122,7 +122,7 @@ public class AllTreatmentController {
             patientList.stream().map(Person::getSurname).forEach(patientSelection::add);
             LOG.info("got {} - {}", patientList, patientList.size());
         } catch (SQLException exception) {
-            LOG.error("SQL had some problems",exception);
+            LOG.error("SQL had some problems", exception);
         }
     }
 

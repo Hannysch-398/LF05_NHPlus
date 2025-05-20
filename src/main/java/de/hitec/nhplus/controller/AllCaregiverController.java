@@ -18,6 +18,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 
@@ -27,18 +28,33 @@ import java.util.List;
  */
 public class AllCaregiverController {
 
-    @FXML private TableView<Nurse> tableView;
-    @FXML private TableColumn<Nurse, Long> columnNid;
-    @FXML private TableColumn<Nurse, String> columnFirstName;
-    @FXML private TableColumn<Nurse, String> columnSurname;
-    @FXML private TableColumn<Nurse, String> columnPhoneNumber;
+    @FXML
+    private TableView<Nurse> tableView;
+    @FXML
+    private TableColumn<Nurse, Long> columnNid;
+    @FXML
+    private TableColumn<Nurse, String> columnFirstName;
+    @FXML
+    private TableColumn<Nurse, String> columnSurname;
+    @FXML
+    private TableColumn<Nurse, String> columnPhoneNumber;
+    @FXML
+    private TableColumn<Nurse, String> columnStatus;
+    @FXML
+    private TableColumn<Nurse, Date> columnDeletionDate;
 
-    @FXML private TextField textFieldFirstName;
-    @FXML private TextField textFieldSurname;
-    @FXML private TextField textFieldPhoneNumber;
 
-    @FXML private Button buttonAdd;
-    @FXML private Button buttonDelete;
+    @FXML
+    private TextField textFieldFirstName;
+    @FXML
+    private TextField textFieldSurname;
+    @FXML
+    private TextField textFieldPhoneNumber;
+
+    @FXML
+    private Button buttonAdd;
+    @FXML
+    private Button buttonDelete;
 
 
     private final ObservableList<Nurse> nurses = FXCollections.observableArrayList();
@@ -66,6 +82,9 @@ public class AllCaregiverController {
         this.columnPhoneNumber.setCellFactory(TextFieldTableCell.forTableColumn());
 
         this.columnNid.setCellValueFactory(new PropertyValueFactory<>("nid"));
+
+        this.columnStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        this.columnDeletionDate.setCellValueFactory(new PropertyValueFactory<>("deletionDate"));
 
 
         //Anzeigen der Daten
@@ -135,6 +154,7 @@ public class AllCaregiverController {
     //       event.getRowValue().setNid(event.getNewValue());
     //       this.doUpdate(event);
     //  }
+
     /**
      * Updates a nurse by calling the method <code>update()</code> of {@link NurseDao}.
      *
@@ -169,7 +189,7 @@ public class AllCaregiverController {
      */
     @FXML
     public void handleDelete() {
-       Nurse selectedItem = this.tableView.getSelectionModel().getSelectedItem();
+        Nurse selectedItem = this.tableView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
             try {
                 DaoFactory.getDaoFactory().createNurseDAO().deleteById(selectedItem.getNid());
@@ -177,6 +197,22 @@ public class AllCaregiverController {
             } catch (SQLException exception) {
                 exception.printStackTrace();
             }
+        }
+    }
+
+    @FXML
+    public void handleMarkForDelete() {
+        Nurse selectedItem = this.tableView.getSelectionModel().getSelectedItem();
+        if (selectedItem != null) {
+            selectedItem.markForDeletion(); // setzt z. B. status = "i", deletionDate = +10 Jahre
+
+            try {
+                DaoFactory.getDaoFactory().createNurseDAO().update(selectedItem); // speichert Soft-Delete
+            } catch (SQLException exception) {
+                exception.printStackTrace();
+            }
+
+            this.tableView.refresh(); // zeigt neue Daten sofort
         }
     }
 
@@ -193,7 +229,8 @@ public class AllCaregiverController {
         String phoneNumber = this.textFieldPhoneNumber.getText();
         System.out.println("handleAdd aufgerufen");
         try {
-            this.dao.create(new Nurse(firstName, surname, phoneNumber));
+
+            this.dao.create(new Nurse(firstName, surname, phoneNumber, Nurse.STATUS_ACTIVE));
             System.out.println("Pflegekraft wird erstellt: " + firstName + " " + surname + " " + phoneNumber);
 
         } catch (SQLException exception) {
@@ -218,11 +255,12 @@ public class AllCaregiverController {
 
 
     }
+
     private boolean areInputDataValid() {
 
 
         return !this.textFieldFirstName.getText().isBlank() && !this.textFieldSurname.getText().isBlank() &&
-                !this.textFieldPhoneNumber.getText().isBlank() ;
+                !this.textFieldPhoneNumber.getText().isBlank();
     }
 
 
