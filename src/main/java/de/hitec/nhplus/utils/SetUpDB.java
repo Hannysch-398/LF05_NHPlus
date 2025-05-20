@@ -4,6 +4,7 @@ import de.hitec.nhplus.datastorage.*;
 import de.hitec.nhplus.model.Nurse;
 import de.hitec.nhplus.model.Patient;
 import de.hitec.nhplus.model.Treatment;
+import de.hitec.nhplus.model.User;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -29,10 +30,18 @@ public class SetUpDB {
         SetUpDB.wipeDb(connection);
         SetUpDB.setUpTablePatient(connection);
         SetUpDB.setUpTableNurse(connection);
+
+        SetUpDB.setUpTableUser(connection);
+
         SetUpDB.setUpTableTreatment(connection);
+
         SetUpDB.setUpPatients();
         SetUpDB.setUpNurse();
+
+        SetUpDB.setUpUsers();
+
         SetUpDB.setUpTreatments();
+
 
     }
 
@@ -45,6 +54,7 @@ public class SetUpDB {
             statement.execute("DROP TABLE patient");
 
             statement.execute("DROP TABLE nurse");
+            statement.execute("DROP TABLE user");
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());
         }
@@ -94,6 +104,22 @@ public class SetUpDB {
         }
     }
 
+    private static void setUpTableUser(Connection connection) {
+        final String SQL = "CREATE TABLE IF NOT EXISTS user (" +
+
+                "   firstname TEXT NOT NULL, " +
+                "   surname TEXT NOT NULL, " +
+                "   id INTEGER PRIMARY KEY AUTOINCREMENT, "+
+                "   username TEXT UNIQUE NOT NULL, " +
+                "   password_hash TEXT NOT NULL" +
+                ");";
+
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(SQL);
+        } catch (SQLException exception) {
+            System.out.println("Error creating table 'user': " + exception.getMessage());
+        }
+    }
 
     private static void setUpPatients() {
         try {
@@ -161,6 +187,15 @@ public class SetUpDB {
             dao.create(new Treatment(17, 6, convertStringToLocalDate("2023-09-01"), convertStringToLocalTime("16:00"),
                     convertStringToLocalTime("17:00"), "KG",
                     "Massage der Extremitäten zur Verbesserung der Durchblutung", 2));
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+    }
+    private static void setUpUsers() {
+        try {
+            UserDao dao = DaoFactory.getDaoFactory().createUserDAO();
+            dao.create(new User( "Max", "Mustermann", 1, "admin", "admin123"));
+            dao.create(new User( "Anna", "Beispiel",2, "anna", "passwort456"));
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
