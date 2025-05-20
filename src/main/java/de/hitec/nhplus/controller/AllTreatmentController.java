@@ -2,8 +2,10 @@ package de.hitec.nhplus.controller;
 
 import de.hitec.nhplus.Main;
 import de.hitec.nhplus.datastorage.DaoFactory;
+import de.hitec.nhplus.datastorage.NurseDao;
 import de.hitec.nhplus.datastorage.PatientDao;
 import de.hitec.nhplus.datastorage.TreatmentDao;
+import de.hitec.nhplus.model.Nurse;
 import de.hitec.nhplus.model.Person;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -48,6 +50,10 @@ public class AllTreatmentController {
     private TableColumn<Treatment, String> columnDescription;
 
     @FXML
+    private TableColumn<Treatment, String> columnNurse;
+
+
+    @FXML
     private ComboBox<String> comboBoxPatientSelection;
 
     @FXML
@@ -71,6 +77,7 @@ public class AllTreatmentController {
         this.columnEnd.setCellValueFactory(new PropertyValueFactory<>("end"));
         this.columnDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
         this.tableView.setItems(this.treatments);
+        this.columnNurse.setCellValueFactory(new PropertyValueFactory<>("nurseName"));
 
         // Disabling the button to delete treatments as long, as no treatment was selected.
         this.buttonDelete.setDisable(true);
@@ -83,10 +90,24 @@ public class AllTreatmentController {
 
     public void readAllAndShowInTableView() {
         this.treatments.clear();
-        comboBoxPatientSelection.getSelectionModel().select(0);
         this.dao = DaoFactory.getDaoFactory().createTreatmentDao();
         try {
-            this.treatments.addAll(dao.readAll());
+            List<Treatment> allTreatments = dao.readAll();
+
+            NurseDao nurseDao = DaoFactory.getDaoFactory().createNurseDAO();
+
+            for (Treatment treatment : allTreatments) {
+                Nurse nurse = nurseDao.read((int) treatment.getNid());
+                if (nurse != null) {
+                    String nurseName = nurse.getSurname() + ", " + nurse.getFirstName();
+                    treatment.setNurseName(nurseName);
+                } else {
+                    treatment.setNurseName("Unbekannt");
+                }
+            }
+
+            this.treatments.addAll(allTreatments);
+            System.out.println("Behandlungen geladen: " + this.treatments.size());
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
