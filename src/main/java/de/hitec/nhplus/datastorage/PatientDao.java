@@ -160,4 +160,14 @@ public class PatientDao extends DaoImp<Patient> {
         }
         return preparedStatement;
     }
+
+    @Override
+    protected PreparedStatement getDeactivateStatement(long key) {
+        return null;
+    }
+
+    @Override
+    protected PreparedStatement setDeleteDateStatement(long key) {
+        return null;
+    }
 }

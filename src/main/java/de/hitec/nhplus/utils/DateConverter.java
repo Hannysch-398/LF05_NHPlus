@@ -24,4 +24,5 @@ public class DateConverter {
     public static String convertLocalTimeToString(LocalTime time) {
         return time.format(DateTimeFormatter.ofPattern(TIME_FORMAT));
     }
+
 }

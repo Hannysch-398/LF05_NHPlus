@@ -21,7 +21,8 @@ import java.time.LocalDate;
 
 
 /**
- * The <code>AllPatientController</code> contains the entire logic of the patient view. It determines which data is displayed and how to react to events.
+ * The <code>AllPatientController</code> contains the entire logic of the patient view. It determines which data is
+ * displayed and how to react to events.
  */
 public class AllPatientController {
 
@@ -112,20 +113,23 @@ public class AllPatientController {
         this.buttonDelete.setDisable(true);
         this.tableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Patient>() {
             @Override
-            public void changed(ObservableValue<? extends Patient> observableValue, Patient oldPatient, Patient newPatient) {;
+            public void changed(ObservableValue<? extends Patient> observableValue, Patient oldPatient,
+                                Patient newPatient) {
+                ;
                 AllPatientController.this.buttonDelete.setDisable(newPatient == null);
             }
         });
 
         this.buttonAdd.setDisable(true);
-        ChangeListener<String> inputNewPatientListener = (observableValue, oldText, newText) ->
-                AllPatientController.this.buttonAdd.setDisable(!AllPatientController.this.areInputDataValid());
+        ChangeListener<String> inputNewPatientListener =
+                (observableValue, oldText, newText) -> AllPatientController.this.buttonAdd.setDisable(
+                        !AllPatientController.this.areInputDataValid());
         this.textFieldSurname.textProperty().addListener(inputNewPatientListener);
         this.textFieldFirstName.textProperty().addListener(inputNewPatientListener);
         this.textFieldDateOfBirth.textProperty().addListener(inputNewPatientListener);
         this.textFieldCareLevel.textProperty().addListener(inputNewPatientListener);
         this.textFieldRoomNumber.textProperty().addListener(inputNewPatientListener);
-     //   this.textFieldAssets.textProperty().addListener(inputNewPatientListener);
+        //   this.textFieldAssets.textProperty().addListener(inputNewPatientListener);
     }
 
     /**
@@ -178,7 +182,7 @@ public class AllPatientController {
      * @param event Event including the changed object and the change.
      */
     @FXML
-    public void handleOnEditRoomNumber(TableColumn.CellEditEvent<Patient, String> event){
+    public void handleOnEditRoomNumber(TableColumn.CellEditEvent<Patient, String> event) {
         event.getRowValue().setRoomNumber(event.getNewValue());
         this.doUpdate(event);
     }
@@ -271,7 +275,7 @@ public class AllPatientController {
         this.textFieldDateOfBirth.clear();
         this.textFieldCareLevel.clear();
         this.textFieldRoomNumber.clear();
-      //  this.textFieldAssets.clear();
+        //  this.textFieldAssets.clear();
     }
 
     private boolean areInputDataValid() {
