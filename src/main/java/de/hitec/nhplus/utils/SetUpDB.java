@@ -194,8 +194,8 @@ public class SetUpDB {
     private static void setUpUsers() {
         try {
             UserDao dao = DaoFactory.getDaoFactory().createUserDAO();
-            dao.create(new User( "Max", "Mustermann", 1, "admin", "admin123"));
-            dao.create(new User( "Anna", "Beispiel",2, "anna", "passwort456"));
+            dao.create(new User( "Max", "Mustermann", 1, "admin", "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"));
+            dao.create(new User( "Anna", "Beispiel",2, "anna", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a"));
         } catch (SQLException exception) {
             exception.printStackTrace();
         }

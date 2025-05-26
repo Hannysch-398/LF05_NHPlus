@@ -1,17 +1,16 @@
 package de.hitec.nhplus.controller;
 import de.hitec.nhplus.Main;
+import de.hitec.nhplus.utils.Session;
 import javafx.fxml.FXMLLoader;
 import de.hitec.nhplus.datastorage.DaoFactory;
 import de.hitec.nhplus.datastorage.UserDao;
 import de.hitec.nhplus.model.User;
 import de.hitec.nhplus.utils.PasswordUtil;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -21,7 +20,7 @@ public class LoginController {
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private Label messageLabel;
-    private Stage stage;
+
 
     public void handleLogin() {
         String inputUsername = usernameField.getText();
@@ -43,10 +42,10 @@ public class LoginController {
             for (User user : users) {
 
                 if (user.getUsername().equals(inputUsername) && user.checkPassword(inputPassword)) {
-
+                    Session.setCurrentUser(user);
                     messageLabel.setText("Login erfolgreich!");
-                    // TODO: Weiterleitung zur Hauptansicht
-                    //Main mainApp = new Main();
+
+                    //zur Hauptseite wechseln
                    mainWindow();
                     return;
                 }
