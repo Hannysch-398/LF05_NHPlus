@@ -10,10 +10,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 
@@ -21,6 +18,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -189,9 +187,20 @@ public class AllCaregiverController {
      * nurse from the database and removes the object from the list, which is the data source of the
      * <code>TableView</code>.
      */
-    @FXML
+   /* @FXML
     public void handleDelete() {
         Nurse selectedItem = this.tableView.getSelectionModel().getSelectedItem();
+        // Sicherheitsabfrage
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Löschen bestätigen");
+        confirmAlert.setHeaderText("Sind Sie sicher?");
+        confirmAlert.setContentText("Möchten Sie diesen Pfleger wirklich löschen?");
+
+        Optional<ButtonType> result = confirmAlert.showAndWait();
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            // Abgebrochen
+            return;
+        }
         if (selectedItem != null) {
             try {
                 DaoFactory.getDaoFactory().createNurseDAO().deleteById(selectedItem.getNid());
@@ -200,11 +209,22 @@ public class AllCaregiverController {
                 exception.printStackTrace();
             }
         }
-    }
+    }*/
 
     @FXML
     public void handleMarkForDelete() {
         Nurse selectedItem = this.tableView.getSelectionModel().getSelectedItem();
+        // Sicherheitsabfrage
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Löschen bestätigen");
+        confirmAlert.setHeaderText("Sind Sie sicher?");
+        confirmAlert.setContentText("Möchten Sie diesen Pfleger wirklich löschen?");
+
+        Optional<ButtonType> result = confirmAlert.showAndWait();
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            // Abgebrochen
+            return;
+        }
         if (selectedItem != null) {
             selectedItem.markForDeletion(); // setzt z. B. status = "i", deletionDate = +10 Jahre
 

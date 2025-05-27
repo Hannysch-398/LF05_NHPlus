@@ -8,10 +8,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import de.hitec.nhplus.model.Patient;
@@ -20,6 +17,7 @@ import de.hitec.nhplus.model.User;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.Optional;
 
 
 /**
@@ -236,6 +234,17 @@ public class AllPatientController {
     @FXML
     public void handleDelete() {
         Patient selectedItem = this.tableView.getSelectionModel().getSelectedItem();
+        // Sicherheitsabfrage
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Löschen bestätigen");
+        confirmAlert.setHeaderText("Sind Sie sicher?");
+        confirmAlert.setContentText("Möchten Sie diesen Patienten wirklich löschen?");
+
+        Optional<ButtonType> result = confirmAlert.showAndWait();
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            // Abgebrochen
+            return;
+        }
         if (selectedItem != null) {
             try {
                 DaoFactory.getDaoFactory().createPatientDAO().deleteById(selectedItem.getPid());
