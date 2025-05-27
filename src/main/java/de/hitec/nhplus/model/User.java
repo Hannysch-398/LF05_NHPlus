@@ -10,11 +10,11 @@ public class User extends Person{
 
 
 
-    public User(String firstName, String surname, long id, String username, String plainPassword) {
+    public User(String firstName, String surname, long id, String username, String passwordHash) {
 
         super(firstName, surname);
         this.username = new SimpleStringProperty(username);
-        this.password = new SimpleStringProperty(PasswordUtil.hashPassword(plainPassword));
+        this.password = new SimpleStringProperty(passwordHash);
     }
     // Für Benutzer aus der Datenbank (mit ID und bereits gehashtem Passwort)
     public User(long id, String firstName, String surname, String username, String passwordHash) {
