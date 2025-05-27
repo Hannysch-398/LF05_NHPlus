@@ -96,6 +96,16 @@ public class UserDao extends DaoImp<User> {
         }
     }
 
+    @Override
+    protected PreparedStatement getDeactivateStatement(long key) {
+        return null;
+    }
+
+    @Override
+    protected PreparedStatement setDeleteDateStatement(long key) {
+        return null;
+    }
+
     // Optional: Login-Funktion
     public User findByUsername(String username) throws SQLException {
         PreparedStatement stmt = connection.prepareStatement(
