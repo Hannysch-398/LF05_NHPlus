@@ -9,6 +9,7 @@ import de.hitec.nhplus.utils.PasswordUtil;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
 import java.io.IOException;
@@ -20,6 +21,7 @@ public class LoginController {
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private Label messageLabel;
+    
 
 
     public void handleLogin() {
@@ -57,6 +59,7 @@ public class LoginController {
             e.printStackTrace();
         }
     }
+
     public void mainWindow() {
         try {
             FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/hitec/nhplus/MainWindowView.fxml"));
@@ -64,7 +67,7 @@ public class LoginController {
 
             Scene scene = new Scene(pane);
             Stage stage = (Stage) usernameField.getScene().getWindow();
-            stage.setTitle("Login");
+            stage.setTitle("NHPlus");
             stage.setScene(scene);
             stage.setResizable(false);
             stage.show();
@@ -72,4 +75,19 @@ public class LoginController {
             e.printStackTrace();
         }
     }
+
+    /*public void showLoginWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/hitec/nhplus/LoginView.fxml"));
+            VBox pane2 = loader.load();
+            Scene scene2 = new Scene(pane2);
+            Stage stage = (Stage) usernameField.getScene().getWindow();
+            stage.setTitle("Login");
+            stage.setScene(scene2);
+            stage.setResizable(false);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }*/
 }
