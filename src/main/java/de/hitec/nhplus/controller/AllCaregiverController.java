@@ -4,6 +4,7 @@ import de.hitec.nhplus.datastorage.DaoFactory;
 import de.hitec.nhplus.datastorage.NurseDao;
 import de.hitec.nhplus.datastorage.PatientDao;
 import de.hitec.nhplus.model.Nurse;
+import de.hitec.nhplus.utils.Session;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -94,8 +95,9 @@ public class AllCaregiverController {
         this.tableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Nurse>() {
             @Override
             public void changed(ObservableValue<? extends Nurse> observableValue, Nurse oldNurse, Nurse newNurse) {
-                ;
-                AllCaregiverController.this.buttonDelete.setDisable(newNurse == null);
+                //Prüfen ob als admin eingeloggt wurde
+                if (Session.isAdmin()){
+                AllCaregiverController.this.buttonDelete.setDisable(newNurse == null);}
             }
         });
 

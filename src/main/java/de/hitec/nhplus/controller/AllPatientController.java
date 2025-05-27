@@ -2,6 +2,7 @@ package de.hitec.nhplus.controller;
 
 import de.hitec.nhplus.datastorage.DaoFactory;
 import de.hitec.nhplus.datastorage.PatientDao;
+import de.hitec.nhplus.utils.Session;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -15,6 +16,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import de.hitec.nhplus.model.Patient;
 import de.hitec.nhplus.utils.DateConverter;
+import de.hitec.nhplus.model.User;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -104,8 +106,6 @@ public class AllPatientController {
         this.columnRoomNumber.setCellValueFactory(new PropertyValueFactory<>("roomNumber"));
         this.columnRoomNumber.setCellFactory(TextFieldTableCell.forTableColumn());
 
-       /* this.columnAssets.setCellValueFactory(new PropertyValueFactory<>("assets"));
-        this.columnAssets.setCellFactory(TextFieldTableCell.forTableColumn());*/
 
         //Anzeigen der Daten
         this.tableView.setItems(this.patients);
@@ -113,24 +113,27 @@ public class AllPatientController {
         this.buttonDelete.setDisable(true);
         this.tableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Patient>() {
             @Override
-            public void changed(ObservableValue<? extends Patient> observableValue, Patient oldPatient,
-                                Patient newPatient) {
-                ;
-                AllPatientController.this.buttonDelete.setDisable(newPatient == null);
+            public void changed(ObservableValue<? extends Patient> observableValue, Patient oldPatient, Patient newPatient) {;
+         //Prüfen ob als admin eingeloggt wurde
+                if (Session.isAdmin()){
+                AllPatientController.this.buttonDelete.setDisable(newPatient == null);}
+
             }
         });
-
         this.buttonAdd.setDisable(true);
-        ChangeListener<String> inputNewPatientListener =
-                (observableValue, oldText, newText) -> AllPatientController.this.buttonAdd.setDisable(
-                        !AllPatientController.this.areInputDataValid());
+
+        if (Session.isAdmin()){
+        ChangeListener<String> inputNewPatientListener = (observableValue, oldText, newText) ->
+                AllPatientController.this.buttonAdd.setDisable(!AllPatientController.this.areInputDataValid());
+
         this.textFieldSurname.textProperty().addListener(inputNewPatientListener);
         this.textFieldFirstName.textProperty().addListener(inputNewPatientListener);
         this.textFieldDateOfBirth.textProperty().addListener(inputNewPatientListener);
         this.textFieldCareLevel.textProperty().addListener(inputNewPatientListener);
         this.textFieldRoomNumber.textProperty().addListener(inputNewPatientListener);
-        //   this.textFieldAssets.textProperty().addListener(inputNewPatientListener);
-    }
+
+    }}
+
 
     /**
      * When a cell of the column with first names was changed, this method will be called, to persist the change.
