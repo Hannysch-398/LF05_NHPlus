@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class AllTreatmentController {
 
@@ -163,6 +164,17 @@ public class AllTreatmentController {
     @FXML
     public void handleDelete() {
         int index = this.tableView.getSelectionModel().getSelectedIndex();
+        // Sicherheitsabfrage
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Löschen bestätigen");
+        confirmAlert.setHeaderText("Sind Sie sicher?");
+        confirmAlert.setContentText("Möchten Sie diesen Behandlungseintrag wirklich löschen?");
+
+        Optional<ButtonType> result = confirmAlert.showAndWait();
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            // Abgebrochen
+            return;
+        }
         Treatment t = this.treatments.remove(index);
         TreatmentDao dao = DaoFactory.getDaoFactory().createTreatmentDao();
         try {
