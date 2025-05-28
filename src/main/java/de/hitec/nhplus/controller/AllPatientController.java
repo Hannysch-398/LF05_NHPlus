@@ -2,6 +2,7 @@ package de.hitec.nhplus.controller;
 
 import de.hitec.nhplus.datastorage.DaoFactory;
 import de.hitec.nhplus.datastorage.PatientDao;
+import de.hitec.nhplus.model.Nurse;
 import de.hitec.nhplus.utils.Session;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -47,9 +48,6 @@ public class AllPatientController {
     @FXML
     private TableColumn<Patient, String> columnRoomNumber;
 
-    /*@FXML
-    private TableColumn<Patient, String> columnAssets;
-*/
     @FXML
     private Button buttonDelete;
 
@@ -232,13 +230,14 @@ public class AllPatientController {
      * <code>TableView</code>.
      */
     @FXML
-    public void handleDelete() {
+    public void handleMarkForDelete() {
         Patient selectedItem = this.tableView.getSelectionModel().getSelectedItem();
+        System.out.println(selectedItem);
         // Sicherheitsabfrage
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle("Löschen bestätigen");
         confirmAlert.setHeaderText("Sind Sie sicher?");
-        confirmAlert.setContentText("Möchten Sie diesen Patienten wirklich löschen?");
+        confirmAlert.setContentText("Möchten Sie diese/n Patient/in wirklich löschen?");
 
         Optional<ButtonType> result = confirmAlert.showAndWait();
         if (result.isEmpty() || result.get() != ButtonType.OK) {
@@ -246,13 +245,15 @@ public class AllPatientController {
             return;
         }
         if (selectedItem != null) {
+            System.out.println("mark for deletion aufgerufen");
+            selectedItem.markForDeletion();
             try {
-                DaoFactory.getDaoFactory().createPatientDAO().deleteById(selectedItem.getPid());
-                this.tableView.getItems().remove(selectedItem);
+                DaoFactory.getDaoFactory().createPatientDAO().update(selectedItem);
             } catch (SQLException exception) {
                 exception.printStackTrace();
             }
         }
+        this.tableView.refresh(); // zeigt neue Daten sofort
     }
 
     /**
@@ -268,9 +269,10 @@ public class AllPatientController {
         LocalDate date = DateConverter.convertStringToLocalDate(birthday);
         String careLevel = this.textFieldCareLevel.getText();
         String roomNumber = this.textFieldRoomNumber.getText();
-        //String assets = this.textFieldAssets.getText();
+
         try {
-            this.dao.create(new Patient(firstName, surname, date, careLevel, roomNumber));
+            this.dao.create(new Patient(firstName, surname, date, careLevel, roomNumber, Patient.STATUS_ACTIVE, null,
+             null       ));
         } catch (SQLException exception) {
             exception.printStackTrace();
         }

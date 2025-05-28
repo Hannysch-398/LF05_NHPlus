@@ -1,7 +1,9 @@
 package de.hitec.nhplus.model;
 
 import de.hitec.nhplus.utils.DateConverter;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 import java.time.LocalDate;
@@ -16,47 +18,56 @@ public class Patient extends Person {
     private final SimpleStringProperty dateOfBirth;
     private final SimpleStringProperty careLevel;
     private final SimpleStringProperty roomNumber;
- //   private final SimpleStringProperty assets;
+    //   private final SimpleStringProperty assets;
     private final List<Treatment> allTreatments = new ArrayList<>();
+    private SimpleStringProperty status;
+    public static final String STATUS_ACTIVE = "a";
+    public static final String STATUS_INACTIVE = "i";
+    private final ObjectProperty<LocalDate> deletionDate = new SimpleObjectProperty<>(null);
+    private final ObjectProperty<LocalDate> archiveDate = new SimpleObjectProperty<>(null);
 
     /**
      * Constructor to initiate an object of class <code>Patient</code> with the given parameter. Use this constructor
      * to initiate objects, which are not persisted yet, because it will not have a patient id (pid).
      *
-     * @param firstName First name of the patient.
-     * @param surname Last name of the patient.
+     * @param firstName   First name of the patient.
+     * @param surname     Last name of the patient.
      * @param dateOfBirth Date of birth of the patient.
-     * @param careLevel Care level of the patient.
-     * @param roomNumber Room number of the patient.
-
+     * @param careLevel   Care level of the patient.
+     * @param roomNumber  Room number of the patient.
      */
-    public Patient(String firstName, String surname, LocalDate dateOfBirth, String careLevel, String roomNumber) {
+    public Patient(String firstName, String surname, LocalDate dateOfBirth, String careLevel, String roomNumber,
+                   String status, LocalDate deletionDate, LocalDate archiveDate) {
         super(firstName, surname);
         this.dateOfBirth = new SimpleStringProperty(DateConverter.convertLocalDateToString(dateOfBirth));
         this.careLevel = new SimpleStringProperty(careLevel);
         this.roomNumber = new SimpleStringProperty(roomNumber);
-      //  this.assets = new SimpleStringProperty(assets);
+        this.status = new SimpleStringProperty(status);
+        this.deletionDate.set(deletionDate);
+        this.archiveDate.set(archiveDate);
     }
 
     /**
      * Constructor to initiate an object of class <code>Patient</code> with the given parameter. Use this constructor
      * to initiate objects, which are already persisted and have a patient id (pid).
      *
-     * @param pid Patient id.
-     * @param firstName First name of the patient.
-     * @param surname Last name of the patient.
+     * @param pid         Patient id.
+     * @param firstName   First name of the patient.
+     * @param surname     Last name of the patient.
      * @param dateOfBirth Date of birth of the patient.
-     * @param careLevel Care level of the patient.
-     * @param roomNumber Room number of the patient.
-
+     * @param careLevel   Care level of the patient.
+     * @param roomNumber  Room number of the patient.
      */
-    public Patient(long pid, String firstName, String surname, LocalDate dateOfBirth, String careLevel, String roomNumber) {
+    public Patient(long pid, String firstName, String surname, LocalDate dateOfBirth, String careLevel,
+                   String roomNumber, String status, LocalDate deletionDate, LocalDate archiveDate) {
         super(firstName, surname);
         this.pid = new SimpleLongProperty(pid);
         this.dateOfBirth = new SimpleStringProperty(DateConverter.convertLocalDateToString(dateOfBirth));
         this.careLevel = new SimpleStringProperty(careLevel);
         this.roomNumber = new SimpleStringProperty(roomNumber);
-//       this.assets = new SimpleStringProperty(assets);
+        this.status = new SimpleStringProperty(status);
+        this.deletionDate.set(deletionDate);
+        this.archiveDate.set(archiveDate);
     }
 
     public long getPid() {
@@ -109,17 +120,30 @@ public class Patient extends Person {
         this.roomNumber.set(roomNumber);
     }
 
-/*    public String getAssets() {
-        return assets.get();
+    public void setStatus(String status) {
+        this.status.set(status);
     }
 
-    public SimpleStringProperty assetsProperty() {
-        return assets;
+    public String getStatus() {
+        return status.get();
     }
 
-    public void setAssets(String assets) {
-        this.assets.set(assets);
-    }*/
+    public LocalDate getDeletionDate() {
+        return deletionDate.get();
+    }
+
+    public void setDeletionDate(LocalDate deletionDate) {
+        this.deletionDate.set(deletionDate);
+    }
+
+
+    public LocalDate getArchiveDate() {
+        return archiveDate.get();
+    }
+
+    public void setArchiveDate(LocalDate archiveDate) {
+        this.archiveDate.set(archiveDate);
+    }
 
     /**
      * Adds a treatment to the list of treatments, if the list does not already contain the treatment.
@@ -136,13 +160,24 @@ public class Patient extends Person {
     }
 
     public String toString() {
-        return "Patient" + "\nMNID: " + this.pid +
-                "\nFirstname: " + this.getFirstName() +
-                "\nSurname: " + this.getSurname() +
-                "\nBirthday: " + this.dateOfBirth +
-                "\nCarelevel: " + this.careLevel +
-                "\nRoomnumber: " + this.roomNumber +
-//                "\nAssets: " + this.assets +
-                "\n";
+        return "Patient" + "\nMNID: " + this.pid + "\nFirstname: " + this.getFirstName() + "\nSurname: " +
+                this.getSurname() + "\nBirthday: " + this.dateOfBirth + "\nCarelevel: " + this.careLevel +
+                "\nRoomnumber: " + this.roomNumber + "\nStatus: " + this.status + "\nDatum gelöscht: " +
+                this.deletionDate + "\nDatum archiviert: " + this.archiveDate + "\n";
     }
+
+    public void markForDeletion() {
+        this.status.set(STATUS_INACTIVE); // optional
+        System.out.println(status);
+        this.archiveDate.set(LocalDate.now());
+        System.out.println(archiveDate);
+        this.deletionDate.set(LocalDate.now().plusYears(10));
+        System.out.println(deletionDate);
+
+
+
+    }
+
+
+
 }

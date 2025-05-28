@@ -1,4 +1,5 @@
 package de.hitec.nhplus.controller;
+import de.hitec.nhplus.datastorage.PatientDao;
 import de.hitec.nhplus.utils.Session;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -67,9 +68,15 @@ public class MainWindowController {
     }
 
     @FXML
-    private void handleShowAllPatient(ActionEvent event) {
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/hitec/nhplus/AllPatientView.fxml"));
+    private void handleShowAllPatient(ActionEvent event) throws SQLException {
+
+
         try {
+
+            PatientDao patientDao = DaoFactory.getDaoFactory().createPatientDAO();
+            patientDao.deleteExpiredPatient();
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/hitec/nhplus/AllPatientView.fxml"));
+
             mainBorderPane.setCenter(loader.load());
         } catch (IOException exception) {
             exception.printStackTrace();

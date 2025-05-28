@@ -35,11 +35,9 @@ public class SetUpDB {
 
         SetUpDB.setUpTableTreatment(connection);
 
-        SetUpDB.setUpPatients();
         SetUpDB.setUpNurse();
-
+        SetUpDB.setUpPatients();
         SetUpDB.setUpUsers();
-
         SetUpDB.setUpTreatments();
 
 
@@ -62,15 +60,10 @@ public class SetUpDB {
 
     private static void setUpTablePatient(Connection connection) {
 
-        final String SQL = "CREATE TABLE IF NOT EXISTS patient (" +
-                "   pid INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "   firstname TEXT NOT NULL, " +
-                "   surname TEXT NOT NULL, " +
-                "   dateOfBirth TEXT NOT NULL, " +
-                "   carelevel TEXT NOT NULL, " +
-                "   roomnumber TEXT NOT NULL " +
-                //"   assets TEXt NOT NULL" +
-                ");";
+        final String SQL = "CREATE TABLE IF NOT EXISTS patient (" + "   pid INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "   firstname TEXT NOT NULL, " + "   surname TEXT NOT NULL, " + "   dateOfBirth TEXT NOT NULL, " +
+                "   carelevel TEXT NOT NULL, " + "   roomnumber TEXT NOT NULL, " + "status TEXT NOT NULL," +
+                "deletionDate DATE," + "archiveDate DATE" + ");";
 
         try (Statement statement = connection.createStatement()) {
             statement.execute(SQL);
@@ -127,12 +120,18 @@ public class SetUpDB {
         try {
             PatientDao dao = DaoFactory.getDaoFactory().createPatientDAO();
 
-            dao.create(new Patient("Seppl", "Herberger", convertStringToLocalDate("1945-12-01"), "4", "202"));
-            dao.create(new Patient("Martina", "Gerdsen", convertStringToLocalDate("1954-08-12"), "5", "010"));
-            dao.create(new Patient("Gertrud", "Franzen", convertStringToLocalDate("1949-04-16"), "3", "002"));
-            dao.create(new Patient("Ahmet", "Yilmaz", convertStringToLocalDate("1941-02-22"), "3", "013"));
-            dao.create(new Patient("Hans", "Neumann", convertStringToLocalDate("1955-12-12"), "2", "001"));
-            dao.create(new Patient("Elisabeth", "Müller", convertStringToLocalDate("1958-03-07"), "5", "110"));
+            dao.create(new Patient("Seppl", "Herberger", convertStringToLocalDate("1945-12-01"), "4", "202",
+                    Patient.STATUS_ACTIVE, null, null));
+            dao.create(new Patient("Martina", "Gerdsen", convertStringToLocalDate("1954-08-12"), "5", "010",
+                    Patient.STATUS_ACTIVE, null, null));
+            dao.create(new Patient("Gertrud", "Franzen", convertStringToLocalDate("1949-04-16"), "3", "002",
+                    Patient.STATUS_ACTIVE, null, null));
+            dao.create(new Patient("Ahmet", "Yilmaz", convertStringToLocalDate("1941-02-22"), "3", "013",
+                    Patient.STATUS_ACTIVE, null, null));
+            dao.create(new Patient("Hans", "Neumann", convertStringToLocalDate("1955-12-12"), "2", "001",
+                    Patient.STATUS_ACTIVE, null, null));
+            dao.create(new Patient("Elisabeth", "Müller", convertStringToLocalDate("1958-03-07"), "5", "110",
+                    Patient.STATUS_ACTIVE, null, null));
 
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -205,5 +204,6 @@ public class SetUpDB {
 
     public static void main(String[] args) {
         SetUpDB.setUpDb();
+        System.out.println("ausgeführt");
     }
 }

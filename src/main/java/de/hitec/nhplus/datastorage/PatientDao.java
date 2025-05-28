@@ -1,5 +1,6 @@
 package de.hitec.nhplus.datastorage;
 
+import de.hitec.nhplus.model.Nurse;
 import de.hitec.nhplus.model.Patient;
 import de.hitec.nhplus.utils.DateConverter;
 
@@ -32,15 +33,32 @@ public class PatientDao extends DaoImp<Patient> {
     protected PreparedStatement getCreateStatement(Patient patient) {
         PreparedStatement preparedStatement = null;
         try {
-            final String SQL = "INSERT INTO patient (firstname, surname, dateOfBirth, carelevel, roomnumber) " +
-                    "VALUES (?, ?, ?, ?, ?)";
+            final String SQL = "INSERT INTO patient (firstname, surname, dateOfBirth, carelevel, roomnumber, status," +
+                    "deletionDate, archiveDate) " +
+                    "VALUES (?, ?, ?, ?, ? ,? , ? , ? )";
             preparedStatement = this.connection.prepareStatement(SQL);
             preparedStatement.setString(1, patient.getFirstName());
             preparedStatement.setString(2, patient.getSurname());
             preparedStatement.setString(3, patient.getDateOfBirth());
             preparedStatement.setString(4, patient.getCareLevel());
             preparedStatement.setString(5, patient.getRoomNumber());
-            //preparedStatement.setString(6, patient.getAssets());
+            preparedStatement.setString(6, patient.getStatus());
+
+            if (patient.getDeletionDate() != null) {
+                System.out.println("insert spalte 7");
+                preparedStatement.setDate(7, java.sql.Date.valueOf(patient.getDeletionDate()));
+            } else {
+                System.out.println("insert spalte 71");
+                preparedStatement.setNull(7, java.sql.Types.DATE);
+            }
+            if (patient.getArchiveDate() != null) {
+                System.out.println("insert spalte 8");
+                preparedStatement.setDate(8, java.sql.Date.valueOf(patient.getArchiveDate()));
+            } else {
+                System.out.println("insert spalte 81");
+                preparedStatement.setNull(8, java.sql.Types.DATE);
+            }
+
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
@@ -74,8 +92,18 @@ public class PatientDao extends DaoImp<Patient> {
      */
     @Override
     protected Patient getInstanceFromResultSet(ResultSet result) throws SQLException {
-        return new Patient(result.getInt(1), result.getString(2), result.getString(3),
-                DateConverter.convertStringToLocalDate(result.getString(4)), result.getString(5), result.getString(6));
+        LocalDate deletionDate = null;
+        if (result.getDate("deletionDate") != null) {
+            deletionDate = result.getDate("deletionDate").toLocalDate();
+        }
+
+        LocalDate archiveDate = null;
+        if (result.getDate("archiveDate") != null) {
+            archiveDate = result.getDate("archiveDate").toLocalDate();
+        }
+        return new Patient(result.getInt(1), result.getString("firstname"), result.getString("surname"),
+                DateConverter.convertStringToLocalDate(result.getString(4)), result.getString("careLevel"),
+                result.getString("roomnumber"), result.getString("status"),deletionDate,archiveDate );
     }
 
     /**
@@ -87,8 +115,9 @@ public class PatientDao extends DaoImp<Patient> {
     protected PreparedStatement getReadAllStatement() {
         PreparedStatement statement = null;
         try {
-            final String SQL = "SELECT * FROM patient";
+            final String SQL = "SELECT * FROM patient WHERE status = ?";
             statement = this.connection.prepareStatement(SQL);
+            statement.setString(1, Patient.STATUS_ACTIVE);
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
@@ -106,10 +135,26 @@ public class PatientDao extends DaoImp<Patient> {
     protected ArrayList<Patient> getListFromResultSet(ResultSet result) throws SQLException {
         ArrayList<Patient> list = new ArrayList<>();
         while (result.next()) {
+            // Konvertierung von java.sql.Date zu LocalDate (null-sicher)
+            LocalDate deletionDate = null;
+            java.sql.Date sqlDeletionDate = result.getDate("deletionDate");
+            if (sqlDeletionDate != null) {
+                deletionDate = sqlDeletionDate.toLocalDate();
+            }
+
+            LocalDate archiveDate = null;
+            java.sql.Date sqlArchiveDate = result.getDate("archiveDate");
+            if (sqlArchiveDate != null) {
+                archiveDate = sqlArchiveDate.toLocalDate();
+            }
+
             LocalDate date = DateConverter.convertStringToLocalDate(result.getString(4));
+
             Patient patient =
-                    new Patient(result.getInt(1), result.getString(2), result.getString(3), date, result.getString(5),
-                            result.getString(6));
+                    new Patient((result.getInt(1)), result.getString("firstname"), result.getString("surname"),
+                            DateConverter.convertStringToLocalDate(result.getString("dateOfBirth")), result.getString(
+                                    "careLevel"),
+                            result.getString("roomnumber"), result.getString("status"),deletionDate,archiveDate );
             list.add(patient);
         }
         return list;
@@ -127,15 +172,33 @@ public class PatientDao extends DaoImp<Patient> {
         PreparedStatement preparedStatement = null;
         try {
             final String SQL = "UPDATE patient SET " + "firstname = ?, " + "surname = ?, " + "dateOfBirth = ?, " +
-                    "carelevel = ?, " + "roomnumber = ?, " + "WHERE pid = ?";/* + "assets = ? "*/
+                    "carelevel = ?, " + "roomnumber = ?, "+ "status = ?,"+"deletionDate = ?,"+"archiveDate= ? " +
+                    "WHERE pid = ?";
+            /* +
+                    "assets = ? "*/
             preparedStatement = this.connection.prepareStatement(SQL);
             preparedStatement.setString(1, patient.getFirstName());
             preparedStatement.setString(2, patient.getSurname());
             preparedStatement.setString(3, patient.getDateOfBirth());
             preparedStatement.setString(4, patient.getCareLevel());
             preparedStatement.setString(5, patient.getRoomNumber());
-            //preparedStatement.setString(6, patient.getAssets());
-            preparedStatement.setLong(6, patient.getPid());
+            preparedStatement.setString(6, patient.getStatus());
+
+
+            if (patient.getDeletionDate() != null) {
+                preparedStatement.setDate(7, java.sql.Date.valueOf(patient.getDeletionDate()));
+            } else {
+                preparedStatement.setNull(7, java.sql.Types.DATE);
+            }
+
+            if (patient.getArchiveDate() != null) {
+                preparedStatement.setDate(8, java.sql.Date.valueOf(patient.getArchiveDate()));
+            } else {
+                preparedStatement.setNull(8, java.sql.Types.DATE);
+            }
+
+
+            preparedStatement.setLong(9, patient.getPid());
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
@@ -162,12 +225,45 @@ public class PatientDao extends DaoImp<Patient> {
     }
 
     @Override
-    protected PreparedStatement getDeactivateStatement(long key) {
-        return null;
+    protected PreparedStatement getDeactivateStatement(long pid) {
+        PreparedStatement preparedStatement = null;
+        try {
+            final String SQL = "UPDATE patient SET active = 'i' WHERE pid = ?";
+            preparedStatement = this.connection.prepareStatement(SQL);
+            preparedStatement.setLong(1, pid);
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+        return preparedStatement;
     }
 
     @Override
-    protected PreparedStatement setDeleteDateStatement(long key) {
-        return null;
+    protected PreparedStatement setDeleteDateStatement(long pid) {
+        PreparedStatement preparedStatement = null;
+        try {
+            final String SQL = "UPDATE patient SET deletionDate = ?, archiveDate = ? WHERE pid = ?";
+            preparedStatement = this.connection.prepareStatement(SQL);
+            preparedStatement.setDate(1, java.sql.Date.valueOf(LocalDate.now().plusYears(10))); // Löschdatum
+            preparedStatement.setDate(2, java.sql.Date.valueOf(LocalDate.now()));               // Archivdatum
+            preparedStatement.setLong(3, pid);
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+        return preparedStatement;
     }
+    public void deleteExpiredPatient() throws SQLException {
+        final String SQL = "DELETE FROM patient " + "WHERE deletionDate IS NOT NULL " + "AND deletionDate <= ? " +
+                "AND status != ?";  // Nur wenn NICHT aktiv
+
+        try (PreparedStatement stmt = this.connection.prepareStatement(SQL)) {
+            stmt.setDate(1, java.sql.Date.valueOf(LocalDate.now()));
+            stmt.setString(2, Patient.STATUS_ACTIVE);
+
+            int deleted = stmt.executeUpdate();
+            System.out.println("Anzahl gelöschter inaktiver Patienten mit abgelaufenem Löschdatum: " + deleted);
+        }
+    }
+
+
+
 }
