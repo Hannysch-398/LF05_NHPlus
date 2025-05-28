@@ -17,8 +17,12 @@ public class Session {
         return currentUser != null ? currentUser.getUsername() : null;
     }
 
+
     public static boolean isAdmin() {
-        return "admin".equals(getCurrentUsername());
+       /*return "admin".equals(getCurrentUsername());
+        User user = getCurrentUser();
+        return user.getAdmin();*/
+        return currentUser.getRole().equals("admin");
     }
 
     public static void clear() {
