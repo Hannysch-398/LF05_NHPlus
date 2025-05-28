@@ -1,6 +1,8 @@
 package de.hitec.nhplus.model;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 import java.time.LocalDate;
@@ -16,7 +18,9 @@ public class Nurse extends Person {
     private SimpleStringProperty status;
     public static final String STATUS_ACTIVE = "a";
     public static final String STATUS_INACTIVE = "i";
-    public LocalDate deletionDate;
+    private final ObjectProperty<LocalDate> deletionDate = new SimpleObjectProperty<>(null);
+    private final ObjectProperty<LocalDate> archiveDate = new SimpleObjectProperty<>(null);
+
 
     /**
      * Constructor to initiate an object of class <code>Nurse</code> with the given parameter. Use this constructor
@@ -26,16 +30,14 @@ public class Nurse extends Person {
      * @param surname     Last name of the nurse.
      * @param phoneNumber phone Number of the nurse.
      */
-    public Nurse(String firstName, String surname, String phoneNumber, String status, Date deletionDate) {
+    public Nurse(String firstName, String surname, String phoneNumber, String status,
+                 LocalDate deletionDate, LocalDate archiveDate) {
         super(firstName, surname);
-        this.nid = new SimpleLongProperty(0);
+        this.nid = new SimpleLongProperty(); // leer – DB vergibt ID später
         this.phoneNumber = new SimpleStringProperty(phoneNumber);
         this.status = new SimpleStringProperty(status);
-        this.deletionDate = null;
-    }
-
-    public Nurse(String firstName, String surname, String phoneNumber, String status) {
-        this(firstName, surname, phoneNumber, status, null);
+        this.deletionDate.set(deletionDate);
+        this.archiveDate.set(archiveDate);
     }
 
     /**
@@ -47,12 +49,17 @@ public class Nurse extends Person {
      * @param surname     Last name of the nurse.
      * @param phoneNumber phoneNumber of the nurse
      */
-    public Nurse(long nid, String firstName, String surname, String phoneNumber, String status) {
+    public Nurse(long nid, String firstName, String surname, String phoneNumber, String status,
+                 LocalDate deletionDate, LocalDate archiveDate) {
         super(firstName, surname);
         this.nid = new SimpleLongProperty(nid);
         this.phoneNumber = new SimpleStringProperty(phoneNumber);
         this.status = new SimpleStringProperty(status);
+        this.deletionDate.set(deletionDate);
+        this.archiveDate.set(archiveDate);
     }
+
+
 
     public long getNid() {
         return (nid != null) ? nid.get() : 0;
@@ -74,11 +81,6 @@ public class Nurse extends Person {
         this.phoneNumber.set(phoneNumber);
     }
 
-    public String toString() {
-        return "Pfleger/in" + "\nNID: " + this.nid + "\nFirstname: " + this.getFirstName() + "\nSurname: " +
-                this.getSurname() + "\nPhoneNumber: " + this.phoneNumber + "\n";
-    }
-
     public void setStatus(String status) {
         this.status.set(status);
     }
@@ -86,21 +88,37 @@ public class Nurse extends Person {
     public String getStatus() {
         return status.get();
     }
+
     public LocalDate getDeletionDate() {
-        return deletionDate;
+        return deletionDate.get();
     }
 
     public void setDeletionDate(LocalDate deletionDate) {
-        this.deletionDate = deletionDate;
+        this.deletionDate.set(deletionDate);
+    }
+
+
+    public LocalDate getArchiveDate() {
+        return archiveDate.get();
+    }
+
+    public void setArchiveDate(LocalDate archiveDate) {
+        this.archiveDate.set(archiveDate);
+    }
+
+    public String toString() {
+        return "Pfleger/in" + "\nNID: " + this.nid + "\nFirstname: " + this.getFirstName() + "\nSurname: " +
+                this.getSurname() + "\nPhoneNumber: " + this.phoneNumber + "\nStatus: " + this.status +
+                "\nDatum gelöscht: " + this.deletionDate +"\nDatum archiviert: " + this.archiveDate +"\n";
     }
 
 
     public void markForDeletion() {
         this.status.set(STATUS_INACTIVE); // optional
-        this.deletionDate = LocalDate.now().plusYears(10);
+        this.archiveDate.set(LocalDate.now());
+        this.deletionDate.set(LocalDate.now().plusYears(10));
+
     }
-
-
 
 
 }
