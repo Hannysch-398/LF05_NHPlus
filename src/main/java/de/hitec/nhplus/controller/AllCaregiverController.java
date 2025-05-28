@@ -252,7 +252,7 @@ public class AllCaregiverController {
         System.out.println("handleAdd aufgerufen");
         try {
 
-            this.dao.create(new Nurse(firstName, surname, phoneNumber, Nurse.STATUS_ACTIVE));
+            this.dao.create(new Nurse(firstName, surname, phoneNumber, Nurse.STATUS_ACTIVE, null,null));
             System.out.println("Pflegekraft wird erstellt: " + firstName + " " + surname + " " + phoneNumber);
 
         } catch (SQLException exception) {

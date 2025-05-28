@@ -33,8 +33,9 @@ public class NurseDao extends DaoImp<Nurse> {
     protected PreparedStatement getCreateStatement(Nurse nurse) {
         PreparedStatement preparedStatement = null;
         try {
-            final String SQL = "INSERT INTO nurse (firstname, surname, phoneNumber,status,deletionDate) " + "VALUES " +
-                    "(?, ?, ?,?,?)";
+            final String SQL = "INSERT INTO nurse (firstname, surname, phoneNumber,status,deletionDate,archiveDate) " +
+                    "VALUES " +
+                    "(?, ?, ?,?,?,?)";
             preparedStatement = this.connection.prepareStatement(SQL);
             preparedStatement.setString(1, nurse.getFirstName());
             preparedStatement.setString(2, nurse.getSurname());
@@ -44,6 +45,11 @@ public class NurseDao extends DaoImp<Nurse> {
                 preparedStatement.setDate(5, java.sql.Date.valueOf(nurse.getDeletionDate()));
             } else {
                 preparedStatement.setNull(5, java.sql.Types.DATE);
+            }
+            if (nurse.getArchiveDate() != null) {
+                preparedStatement.setDate(6, java.sql.Date.valueOf(nurse.getArchiveDate()));
+            } else {
+                preparedStatement.setNull(6, java.sql.Types.DATE);
             }
 
         } catch (SQLException exception) {
@@ -79,10 +85,25 @@ public class NurseDao extends DaoImp<Nurse> {
      */
     @Override
     protected Nurse getInstanceFromResultSet(ResultSet result) throws SQLException {
+        LocalDate deletionDate = null;
+        if (result.getDate("deletionDate") != null) {
+            deletionDate = result.getDate("deletionDate").toLocalDate();
+        }
 
-        return new Nurse(result.getLong(1), result.getString(2), result.getString(3), result.getString(4),
-                result.getString(5));
+        LocalDate archiveDate = null;
+        if (result.getDate("archiveDate") != null) {
+            archiveDate = result.getDate("archiveDate").toLocalDate();
+        }
 
+        return new Nurse(
+                result.getLong("nid"),
+                result.getString("firstname"),
+                result.getString("surname"),
+                result.getString("phoneNumber"),
+                result.getString("status"),
+                deletionDate,
+                archiveDate
+        );
     }
 
     /**
@@ -114,14 +135,34 @@ public class NurseDao extends DaoImp<Nurse> {
     protected ArrayList<Nurse> getListFromResultSet(ResultSet result) throws SQLException {
         ArrayList<Nurse> list = new ArrayList<>();
         while (result.next()) {
-            Nurse nurse = new Nurse(result.getLong(1), result.getString(2), result.getString(3), result.getString(4),
-                    result.getString(5));
+            // Konvertierung von java.sql.Date zu LocalDate (null-sicher)
+            LocalDate deletionDate = null;
+            java.sql.Date sqlDeletionDate = result.getDate("deletionDate");
+            if (sqlDeletionDate != null) {
+                deletionDate = sqlDeletionDate.toLocalDate();
+            }
 
+            LocalDate archiveDate = null;
+            java.sql.Date sqlArchiveDate = result.getDate("archiveDate");
+            if (sqlArchiveDate != null) {
+                archiveDate = sqlArchiveDate.toLocalDate();
+            }
+
+            Nurse nurse = new Nurse(
+                    result.getLong("nid"),
+                    result.getString("firstname"),
+                    result.getString("surname"),
+                    result.getString("phoneNumber"),
+                    result.getString("status"),
+                    deletionDate,
+                    archiveDate
+            );
 
             list.add(nurse);
         }
         return list;
     }
+
 
     /**
      * Generates a <code>PreparedStatement</code> to update the given nurse, identified
@@ -136,7 +177,7 @@ public class NurseDao extends DaoImp<Nurse> {
         try {
             final String SQL =
                     "UPDATE nurse SET " + "firstname = ?, " + "surname = ?, " + "phoneNumber = ?, " + "status = ?," +
-                            "deletionDate = ?" + "WHERE nid = ?";
+                            "deletionDate = ?, archiveDate = ?" + "WHERE nid = ?";
             preparedStatement = this.connection.prepareStatement(SQL);
             preparedStatement.setString(1, nurse.getFirstName());
             preparedStatement.setString(2, nurse.getSurname());
@@ -144,13 +185,19 @@ public class NurseDao extends DaoImp<Nurse> {
             preparedStatement.setString(4, nurse.getStatus());
 
 
-
             if (nurse.getDeletionDate() != null) {
                 preparedStatement.setDate(5, java.sql.Date.valueOf(nurse.getDeletionDate()));
             } else {
                 preparedStatement.setNull(5, java.sql.Types.DATE);
             }
-            preparedStatement.setLong(6, nurse.getNid());
+
+            if (nurse.getArchiveDate() != null) {
+                preparedStatement.setDate(6, java.sql.Date.valueOf(nurse.getArchiveDate()));
+            } else {
+                preparedStatement.setNull(6, java.sql.Types.DATE);
+            }
+
+            preparedStatement.setLong(7, nurse.getNid());
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
@@ -188,36 +235,34 @@ public class NurseDao extends DaoImp<Nurse> {
         }
         return preparedStatement;
     }
-
     @Override
     protected PreparedStatement setDeleteDateStatement(long nid) {
         PreparedStatement preparedStatement = null;
         try {
-            final String SQL = "UPDATE nurse SET deletionDate = ? WHERE nid = ?";
+            final String SQL = "UPDATE nurse SET deletionDate = ?, archiveDate = ? WHERE nid = ?";
             preparedStatement = this.connection.prepareStatement(SQL);
-            preparedStatement.setDate(1, java.sql.Date.valueOf(LocalDate.now().plusYears(10)));
-            preparedStatement.setLong(2, nid);
+            preparedStatement.setDate(1, java.sql.Date.valueOf(LocalDate.now().plusYears(10))); // Löschdatum
+            preparedStatement.setDate(2, java.sql.Date.valueOf(LocalDate.now()));               // Archivdatum
+            preparedStatement.setLong(3, nid);
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
         return preparedStatement;
     }
 
+
     public void deleteExpiredNurses() throws SQLException {
-        final String SQL = "DELETE FROM nurse " +
-                "WHERE deletionDate IS NOT NULL " +
-                "AND deletionDate <= ? " +
+        final String SQL = "DELETE FROM nurse " + "WHERE deletionDate IS NOT NULL " + "AND deletionDate <= ? " +
                 "AND status != ?";  // Nur wenn NICHT aktiv
 
         try (PreparedStatement stmt = this.connection.prepareStatement(SQL)) {
             stmt.setDate(1, java.sql.Date.valueOf(LocalDate.now()));
-            stmt.setString(2, Nurse.STATUS_ACTIVE); // z. B. "a"
+            stmt.setString(2, Nurse.STATUS_ACTIVE);
+
             int deleted = stmt.executeUpdate();
             System.out.println("Anzahl gelöschter inaktiver Pflegekräfte mit abgelaufenem Löschdatum: " + deleted);
         }
     }
-
-
 
 
 }
