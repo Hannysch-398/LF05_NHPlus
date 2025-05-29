@@ -7,6 +7,7 @@ public class User extends Person{
     private long id;
     private final SimpleStringProperty username;
     private final SimpleStringProperty password;
+    private String role;
 
 
 
@@ -17,11 +18,12 @@ public class User extends Person{
         this.password = new SimpleStringProperty(passwordHash);
     }
     // Für Benutzer aus der Datenbank (mit ID und bereits gehashtem Passwort)
-    public User(long id, String firstName, String surname, String username, String passwordHash) {
+    public User(long id, String firstName, String surname, String username, String passwordHash, String role) {
         super(firstName, surname);
         this.id = id;
         this.username = new SimpleStringProperty(username);
         this.password = new SimpleStringProperty(passwordHash);
+        this.role = role;
     }
 
     public long getId() {
@@ -35,6 +37,7 @@ public class User extends Person{
     public String getUsername() {
         return username.get();
     }
+
 
     public SimpleStringProperty usernameProperty() {
         return username;
@@ -58,6 +61,11 @@ public class User extends Person{
 
     public boolean checkPassword(String plainPassword) {
         return PasswordUtil.hashPassword(plainPassword).equals(getPassword());
+    }
+    public String getRole()
+    {return role;}
+    public void setAdmin(String role){
+        this.role = role;
     }
     /*
     public SimpleStringProperty usernameProperty() {

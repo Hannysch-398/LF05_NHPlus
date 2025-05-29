@@ -121,7 +121,8 @@ public class SetUpDB {
                 "   surname TEXT NOT NULL, " +
                 "   id INTEGER PRIMARY KEY AUTOINCREMENT, "+
                 "   username TEXT UNIQUE NOT NULL, " +
-                "   password_hash TEXT NOT NULL" +
+                "   password_hash TEXT NOT NULL," +
+                "   role TEXT NOT NULL" +
                 ");";
 
         try (Statement statement = connection.createStatement()) {
@@ -210,8 +211,9 @@ public class SetUpDB {
     private static void setUpUsers() {
         try {
             UserDao dao = DaoFactory.getDaoFactory().createUserDAO();
-            dao.create(new User( "Max", "Mustermann", 1, "admin", "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"));
-            dao.create(new User( "Anna", "Beispiel",2, "anna", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a"));
+            dao.create(new User( 1, "Mustermann", "Max", "admin", "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9", "admin"));
+            dao.create(new User( 2, "Beispiel","Anna", "anna", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a", ""));
+            dao.create(new User( 3, "Boot","Ben", "ben", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a", ""));
         } catch (SQLException exception) {
             exception.printStackTrace();
         }

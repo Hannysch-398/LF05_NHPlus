@@ -4,11 +4,13 @@ import de.hitec.nhplus.datastorage.DaoFactory;
 import de.hitec.nhplus.datastorage.NurseDao;
 import de.hitec.nhplus.datastorage.PatientDao;
 import de.hitec.nhplus.model.Nurse;
+
 import de.hitec.nhplus.utils.Session;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -41,7 +43,8 @@ public class AllCaregiverController {
     private TableColumn<Nurse, String> columnStatus;
     @FXML
     private TableColumn<Nurse, Date> columnDeletionDate;
-
+    @FXML
+    private Button buttonEdit;
 
     @FXML
     private TextField textFieldFirstName;
@@ -100,13 +103,14 @@ public class AllCaregiverController {
         });
 
         this.buttonAdd.setDisable(true);
+        if (Session.isAdmin()){
         ChangeListener<String> inputNewNurseListener =
                 (observableValue, oldText, newText) -> AllCaregiverController.this.buttonAdd.setDisable(
                         !AllCaregiverController.this.areInputDataValid());
         this.textFieldSurname.textProperty().addListener(inputNewNurseListener);
         this.textFieldFirstName.textProperty().addListener(inputNewNurseListener);
-        this.textFieldPhoneNumber.textProperty().addListener(inputNewNurseListener);
-
+        this.textFieldPhoneNumber.textProperty().addListener(inputNewNurseListener);}
+        this.buttonEdit.setDisable(!Session.isAdmin());
 
     }
 
@@ -286,4 +290,40 @@ public class AllCaregiverController {
     }
 
 
+    @FXML
+    public void handleEdit() {
+
+        Nurse selected = this.tableView.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            return; // kein Element ausgewählt
+        }
+
+        // Daten aus Textfeldern holen
+        String newFirstName = this.textFieldFirstName.getText();
+        String newSurname = this.textFieldSurname.getText();
+        String newPhoneNumber = this.textFieldPhoneNumber.getText();
+
+        // Validierung
+        /*if (newFirstName.isBlank() || newSurname.isBlank() || newPhoneNumber.isBlank()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Bitte alle Felder ausfüllen.");
+            alert.show();
+            return;
+        }*/
+
+        // Objekt aktualisieren
+        if (!newFirstName.isEmpty()){
+        selected.setFirstName(newFirstName);}
+        if(!newSurname.isEmpty()){
+        selected.setSurname(newSurname);}
+        if (!newPhoneNumber.isEmpty()){
+        selected.setPhoneNumber(newPhoneNumber);}
+
+        try {
+            this.dao.update(selected); // Änderungen in der DB speichern
+            this.tableView.refresh(); // Ansicht aktualisieren
+            clearTextfields();        // Eingabefelder leeren
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

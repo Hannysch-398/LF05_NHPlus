@@ -1,6 +1,5 @@
 package de.hitec.nhplus.datastorage;
 import de.hitec.nhplus.model.User;
-import javafx.beans.property.SimpleStringProperty;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -17,7 +16,8 @@ public class UserDao extends DaoImp<User> {
         String surname = set.getString("surname");
         String username = set.getString("username");
         String password = set.getString("password_hash");
-        return new User(id, firstName, surname, username, password);
+        String role = set.getString("role");
+        return new User(id, firstName, surname, username, password, role);
     }
 
     @Override
@@ -33,12 +33,16 @@ public class UserDao extends DaoImp<User> {
     protected PreparedStatement getCreateStatement(User user) {
         try {
             PreparedStatement stmt = connection.prepareStatement(
+
                     "INSERT INTO user (firstname, surname, username, password_hash) VALUES (?, ?,?,?)",
+                 "INSERT INTO user (firstName, surname, username, password_hash, role) VALUES (?, ?,?,?,?)",
+
                     Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, user.getFirstName());
             stmt.setString(2, user.getSurname());
             stmt.setString(3, user.getUsername());
             stmt.setString(4, user.getPassword());
+            stmt.setString(5, user.getRole());
             return stmt;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -70,13 +74,13 @@ public class UserDao extends DaoImp<User> {
     protected PreparedStatement getUpdateStatement(User user) {
         try {
             PreparedStatement stmt = connection.prepareStatement(
-                    "UPDATE user SET firstname = ?, surname= ?, username = ?, password_hash = ? WHERE id = ?");
+                    "UPDATE user SET firstname = ?, surname= ?, username = ?, password_hash = ?, role = ? WHERE id = ?");
             stmt.setString(1, user.getFirstName());
             stmt.setString(2, user.getSurname());
-
             stmt.setString(3, user.getUsername());
             stmt.setString(4, user.getPassword());
-            stmt.setLong(5, user.getId());
+            stmt.setString(5, user.getRole());
+            stmt.setLong(6, user.getId());
 
             return stmt;
         } catch (SQLException e) {

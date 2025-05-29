@@ -36,6 +36,7 @@ public class LoginController {
         System.out.println("Eingegebenes Passwort (klar): " + inputPassword);
         System.out.println("Gehasht (zur Kontrolle): " + PasswordUtil.hashPassword(inputPassword));
 
+
         try {
             UserDao userDao = DaoFactory.getDaoFactory().createUserDAO();
             List<User> users = userDao.readAll();
@@ -45,6 +46,7 @@ public class LoginController {
 
                 if (user.getUsername().equals(inputUsername) && user.checkPassword(inputPassword)) {
                     Session.setCurrentUser(user);
+                    System.out.println(Session.isAdmin());
                     messageLabel.setText("Login erfolgreich!");
 
                     //zur Hauptseite wechseln
