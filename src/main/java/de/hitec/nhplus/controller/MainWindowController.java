@@ -1,4 +1,7 @@
 package de.hitec.nhplus.controller;
+
+import de.hitec.nhplus.datastorage.PatientDao;
+import de.hitec.nhplus.datastorage.TreatmentDao;
 import de.hitec.nhplus.utils.Session;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -68,26 +71,34 @@ public class MainWindowController {
 
     @FXML
     private void handleShowAllPatient(ActionEvent event) {
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/hitec/nhplus/AllPatientView.fxml"));
         try {
+            PatientDao patientDao = DaoFactory.getDaoFactory().createPatientDAO();
+            patientDao.deleteExpiredPatient();
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/hitec/nhplus/AllPatientView.fxml"));
+
             mainBorderPane.setCenter(loader.load());
-        } catch (IOException exception) {
+        } catch (IOException | SQLException exception) {
             exception.printStackTrace();
         }
     }
 
     @FXML
     private void handleShowAllTreatments(ActionEvent event) {
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/hitec/nhplus/AllTreatmentView.fxml"));
         try {
+            TreatmentDao treatmentDao = DaoFactory.getDaoFactory().createTreatmentDao();
+            treatmentDao.deleteExpiredTreatments();
+
+
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/hitec/nhplus/AllTreatmentView.fxml"));
             mainBorderPane.setCenter(loader.load());
-        } catch (IOException exception) {
+
+        } catch (IOException | SQLException exception) {
             exception.printStackTrace();
         }
     }
 
     @FXML
-    private void handleShowAllCaregiver(ActionEvent event){
+    private void handleShowAllCaregiver(ActionEvent event) {
         try {
             // Vor dem Laden: veraltete Einträge prüfen und ggf. löschen
             NurseDao nurseDao = DaoFactory.getDaoFactory().createNurseDAO();
@@ -103,12 +114,12 @@ public class MainWindowController {
     }
 
     @FXML
-    private void handleShowTest(ActionEvent event){
+    private void handleShowTest(ActionEvent event) {
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/hitec/nhplus/TestView.fxml"));
-        try{
+        try {
             mainBorderPane.setCenter(loader.load());
 
-        }catch (IOException exception){
+        } catch (IOException exception) {
             exception.printStackTrace();
         }
     }

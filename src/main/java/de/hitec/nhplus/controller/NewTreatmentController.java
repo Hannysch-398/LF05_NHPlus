@@ -119,7 +119,8 @@ public class NewTreatmentController {
         String remarks = textAreaRemarks.getText();
 
         Treatment treatment = new Treatment(
-                patient.getPid(), date, begin, end, description, remarks, selectedNurse.getNid()
+                patient.getPid(), date, begin, end, description, remarks, selectedNurse.getNid(),
+                Treatment.STATUS_ACTIVE,null, null
         );
         createTreatment(treatment);
 

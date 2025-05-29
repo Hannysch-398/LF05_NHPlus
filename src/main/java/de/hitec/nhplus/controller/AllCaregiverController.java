@@ -179,9 +179,9 @@ public class AllCaregiverController {
     private void readAllAndShowInTableView() throws SQLException {
         this.nurses.clear();
         this.dao = DaoFactory.getDaoFactory().createNurseDAO();
-        System.out.println("readAll aufgerufen");
+
         List<Nurse> result = this.dao.readAll();
-        System.out.println("Gefundene Pflegekräfte: " + result.size());
+
         this.nurses.addAll(result);
     }
 
