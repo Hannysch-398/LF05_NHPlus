@@ -162,7 +162,7 @@ public class AllTreatmentController {
     }
 
     @FXML
-    public void handleDelete() {
+    public void handleMarkForDelete() {
         int index = this.tableView.getSelectionModel().getSelectedIndex();
         // Sicherheitsabfrage
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -174,13 +174,25 @@ public class AllTreatmentController {
         if (result.isEmpty() || result.get() != ButtonType.OK) {
             // Abgebrochen
             return;
-        }
+        }/*
         Treatment t = this.treatments.remove(index);
         TreatmentDao dao = DaoFactory.getDaoFactory().createTreatmentDao();
         try {
             dao.deleteById(t.getTid());
         } catch (SQLException exception) {
             exception.printStackTrace();
+        }*/
+        Treatment selectedItem = this.treatments.get(index);
+        if (selectedItem != null) {
+            selectedItem.markForDeletion(); // setzt z. B. status = "i", deletionDate = +10 Jahre
+
+            try {
+                DaoFactory.getDaoFactory().createTreatmentDao().update(selectedItem); // speichert Soft-Delete
+            } catch (SQLException exception) {
+                exception.printStackTrace();
+            }
+
+            this.tableView.refresh(); // zeigt neue Daten sofort
         }
     }
 

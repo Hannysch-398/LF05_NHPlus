@@ -33,7 +33,7 @@ public class UserDao extends DaoImp<User> {
     protected PreparedStatement getCreateStatement(User user) {
         try {
             PreparedStatement stmt = connection.prepareStatement(
-                    "INSERT INTO user (firstName, surname, username, password_hash) VALUES (?, ?,?,?)",
+                    "INSERT INTO user (firstname, surname, username, password_hash) VALUES (?, ?,?,?)",
                     Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, user.getFirstName());
             stmt.setString(2, user.getSurname());
@@ -98,12 +98,12 @@ public class UserDao extends DaoImp<User> {
 
     @Override
     protected PreparedStatement getDeactivateStatement(long key) {
-        return null;
+        throw new UnsupportedOperationException("Users cannot be deactivated.");
     }
 
     @Override
     protected PreparedStatement setDeleteDateStatement(long key) {
-        return null;
+        throw new UnsupportedOperationException("Users cannot be deactivated.");
     }
 
     // Optional: Login-Funktion

@@ -1,5 +1,6 @@
 package de.hitec.nhplus.datastorage;
 
+import de.hitec.nhplus.model.Nurse;
 import de.hitec.nhplus.model.Treatment;
 import de.hitec.nhplus.utils.DateConverter;
 
@@ -35,8 +36,9 @@ public class TreatmentDao extends DaoImp<Treatment> {
         PreparedStatement preparedStatement = null;
         try {
 
-            final String SQL = "INSERT INTO treatment (pid, treatment_date, begin, end, description, remark,nid ) " +
-                    "VALUES (?, ?, ?, ?, ?, ?,?)";
+            final String SQL =
+                    "INSERT INTO treatment (pid, treatment_date, begin, end, description, remark,nid,status," +
+                            "deletionDate,archiveDate ) " + "VALUES (?, ?, ?, ?, ?, ?,?,?,?,?)";
             preparedStatement = this.connection.prepareStatement(SQL);
             preparedStatement.setLong(1, treatment.getPid());
             preparedStatement.setString(2, treatment.getDate());
@@ -45,6 +47,17 @@ public class TreatmentDao extends DaoImp<Treatment> {
             preparedStatement.setString(5, treatment.getDescription());
             preparedStatement.setString(6, treatment.getRemarks());
             preparedStatement.setLong(7, treatment.getNid());
+            preparedStatement.setString(8, treatment.getStatus());
+            if (treatment.getDeletionDate() != null) {
+                preparedStatement.setDate(9, java.sql.Date.valueOf(treatment.getDeletionDate()));
+            } else {
+                preparedStatement.setNull(9, java.sql.Types.DATE);
+            }
+            if (treatment.getArchiveDate() != null) {
+                preparedStatement.setDate(10, java.sql.Date.valueOf(treatment.getArchiveDate()));
+            } else {
+                preparedStatement.setNull(10, java.sql.Types.DATE);
+            }
 
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -82,8 +95,16 @@ public class TreatmentDao extends DaoImp<Treatment> {
         LocalDate date = DateConverter.convertStringToLocalDate(result.getString(3));
         LocalTime begin = DateConverter.convertStringToLocalTime(result.getString(4));
         LocalTime end = DateConverter.convertStringToLocalTime(result.getString(5));
-        return new Treatment(result.getLong(1), result.getLong(2),
-                date, begin, end, result.getString(6), result.getString(7), result.getLong(8));
+        LocalDate deletionDate = null;
+        if (result.getDate("deletionDate") != null) {
+            deletionDate = result.getDate("deletionDate").toLocalDate();
+        }
+        LocalDate archiveDate = null;
+        if (result.getDate("archiveDate") != null) {
+            archiveDate = result.getDate("archiveDate").toLocalDate();
+        }
+        return new Treatment(result.getLong(1), result.getLong(2), date, begin, end, result.getString(6),
+                result.getString(7), result.getLong(8), result.getString("status"), deletionDate, archiveDate);
     }
 
     /**
@@ -118,8 +139,21 @@ public class TreatmentDao extends DaoImp<Treatment> {
             LocalDate date = DateConverter.convertStringToLocalDate(result.getString(3));
             LocalTime begin = DateConverter.convertStringToLocalTime(result.getString(4));
             LocalTime end = DateConverter.convertStringToLocalTime(result.getString(5));
-            Treatment treatment = new Treatment(result.getLong(1), result.getLong(2),
-                    date, begin, end, result.getString(6), result.getString(7), result.getLong(8));
+            LocalDate deletionDate = null;
+            java.sql.Date sqlDeletionDate = result.getDate("deletionDate");
+            if (sqlDeletionDate != null) {
+                deletionDate = sqlDeletionDate.toLocalDate();
+            }
+
+            LocalDate archiveDate = null;
+            java.sql.Date sqlArchiveDate = result.getDate("archiveDate");
+            if (sqlArchiveDate != null) {
+                archiveDate = sqlArchiveDate.toLocalDate();
+            }
+            Treatment treatment =
+                    new Treatment(result.getLong(1), result.getLong(2), date, begin, end, result.getString(6),
+                            result.getString(7), result.getLong(8), result.getString("status"), deletionDate,
+                            archiveDate);
             list.add(treatment);
         }
         return list;
@@ -168,15 +202,9 @@ public class TreatmentDao extends DaoImp<Treatment> {
         PreparedStatement preparedStatement = null;
         try {
             final String SQL =
-                    "UPDATE treatment SET " +
-                            "pid = ?, " +
-                            "treatment_date = ?, " +
-                            "begin = ?, " +
-                            "end = ?, " +
-                            "description = ?, " +
-                            "remark = ? " +
-                            "nid = ?"+
-                            "WHERE tid = ?";
+                    "UPDATE treatment SET " + "pid = ?, " + "treatment_date = ?, " + "begin = ?, " + "end = ?, " +
+                            "description = ?, " + "remark = ?, " + "nid = ?," +"status = ?, "+"deletionDate = ?,"+
+                            "archiveDate=?" + "WHERE tid = ?";
             preparedStatement = this.connection.prepareStatement(SQL);
             preparedStatement.setLong(1, treatment.getPid());
             preparedStatement.setString(2, treatment.getDate());
@@ -184,8 +212,22 @@ public class TreatmentDao extends DaoImp<Treatment> {
             preparedStatement.setString(4, treatment.getEnd());
             preparedStatement.setString(5, treatment.getDescription());
             preparedStatement.setString(6, treatment.getRemarks());
-            preparedStatement.setLong(7, treatment.getTid());
-            preparedStatement.setLong(8,treatment.getNid());
+            preparedStatement.setLong(7, treatment.getNid());
+            preparedStatement.setString(8, treatment.getStatus());
+
+            if (treatment.getDeletionDate() != null) {
+                preparedStatement.setDate(9, java.sql.Date.valueOf(treatment.getDeletionDate()));
+            } else {
+                preparedStatement.setNull(9, java.sql.Types.DATE);
+            }
+
+            if (treatment.getArchiveDate() != null) {
+                preparedStatement.setDate(10, java.sql.Date.valueOf(treatment.getArchiveDate()));
+            } else {
+                preparedStatement.setNull(10, java.sql.Types.DATE);
+            }
+
+            preparedStatement.setLong(11, treatment.getTid()); // → WHERE tid = ?
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
@@ -202,8 +244,7 @@ public class TreatmentDao extends DaoImp<Treatment> {
     protected PreparedStatement getDeleteStatement(long tid) {
         PreparedStatement preparedStatement = null;
         try {
-            final String SQL =
-                    "DELETE FROM treatment WHERE tid = ?";
+            final String SQL = "DELETE FROM treatment WHERE tid = ?";
             preparedStatement = this.connection.prepareStatement(SQL);
             preparedStatement.setLong(1, tid);
         } catch (SQLException exception) {
@@ -213,12 +254,51 @@ public class TreatmentDao extends DaoImp<Treatment> {
     }
 
     @Override
-    protected PreparedStatement getDeactivateStatement(long key) {
-        return null;
+    protected PreparedStatement getDeactivateStatement(long tid) {
+        PreparedStatement preparedStatement = null;
+        try {
+            final String SQL = "UPDATE treatment SET active = 'i' WHERE tid = ?";
+            preparedStatement = this.connection.prepareStatement(SQL);
+            preparedStatement.setLong(1, tid);
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+        return preparedStatement;
     }
 
     @Override
-    protected PreparedStatement setDeleteDateStatement(long key) {
-        return null;
+    protected PreparedStatement setDeleteDateStatement(long tid) {
+        PreparedStatement preparedStatement = null;
+        try {
+            final String SQL = "UPDATE treatment SET deletionDate = ?, archiveDate = ? WHERE tid = ?";
+            preparedStatement = this.connection.prepareStatement(SQL);
+            preparedStatement.setDate(1, java.sql.Date.valueOf(LocalDate.now().plusYears(10))); // Löschdatum
+            preparedStatement.setDate(2, java.sql.Date.valueOf(LocalDate.now()));               // Archivdatum
+            preparedStatement.setLong(3, tid);
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+        return preparedStatement;
     }
+
+    public void deleteExpiredTreatments() throws SQLException {
+        final String SQL = "DELETE FROM treatment " + "WHERE deletionDate IS NOT NULL " + "AND deletionDate <= ? " +
+                "AND status != ?";  // Nur wenn NICHT aktiv
+
+        try (PreparedStatement stmt = this.connection.prepareStatement(SQL)) {
+            stmt.setDate(1, java.sql.Date.valueOf(LocalDate.now()));
+            stmt.setString(2, Treatment.STATUS_ACTIVE);
+
+            int deleted = stmt.executeUpdate();
+            System.out.println("Anzahl gelöschter inaktiver Behandlungen mit abgelaufenem Löschdatum: " + deleted);
+        }
+    }
+
+
+
+    //Alle Behandlungen löschen/ sperren wenn der entsprechende Patient gesperrt wurde
+
+
+
+
 }

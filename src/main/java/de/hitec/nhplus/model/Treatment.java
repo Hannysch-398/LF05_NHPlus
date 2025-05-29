@@ -1,7 +1,11 @@
 package de.hitec.nhplus.model;
 
 import de.hitec.nhplus.utils.DateConverter;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 
+import java.nio.channels.ClosedChannelException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -14,7 +18,12 @@ public class Treatment {
     private String description;
     private String remarks;
     private long nid;
-    private String nurseName; // Anzeigezweck
+    private String nurseName;
+    private SimpleStringProperty status;
+    public static final String STATUS_ACTIVE = "a";
+    public static final String STATUS_INACTIVE = "i";
+    private final ObjectProperty<LocalDate> deletionDate = new SimpleObjectProperty<>(null);
+    private final ObjectProperty<LocalDate> archiveDate = new SimpleObjectProperty<>(null);
 
     public String getNurseName() {
         return nurseName;
@@ -36,7 +45,7 @@ public class Treatment {
      * @param nid         Id of the nurse that did the treatment.
      */
     public Treatment(long pid, LocalDate date, LocalTime begin, LocalTime end, String description, String remarks,
-                     long nid) {
+                     long nid, String status, LocalDate deletionDate, LocalDate archiveDate) {
         this.pid = pid;
         this.date = date;
         this.begin = begin;
@@ -44,6 +53,9 @@ public class Treatment {
         this.description = description;
         this.remarks = remarks;
         this.nid = nid;
+        this.status = new SimpleStringProperty(status);
+        this.deletionDate.set(deletionDate);
+        this.archiveDate.set(archiveDate);
     }
 
     /**
@@ -60,7 +72,7 @@ public class Treatment {
      * @param nid         Id of the nurse that did the treatment
      */
     public Treatment(long tid, long pid, LocalDate date, LocalTime begin, LocalTime end, String description,
-                     String remarks, long nid) {
+                     String remarks, long nid, String status, LocalDate deletionDate, LocalDate archiveDate) {
         this.tid = tid;
         this.pid = pid;
         this.date = date;
@@ -69,6 +81,9 @@ public class Treatment {
         this.description = description;
         this.remarks = remarks;
         this.nid = nid;
+        this.status = new SimpleStringProperty(status);
+        this.deletionDate.set(deletionDate);
+        this.archiveDate.set(archiveDate);
     }
 
     public long getTid() {
@@ -101,7 +116,7 @@ public class Treatment {
 
     public void setBegin(String begin) {
         this.begin = DateConverter.convertStringToLocalTime(begin);
-        ;
+
     }
 
     public void setEnd(String end) {
@@ -125,13 +140,45 @@ public class Treatment {
         this.remarks = remarks;
     }
 
+    public String getStatus(){
+        return status.get();
+    }
+
+    public void setStatus(String status){
+        this.status.set(status);
+    }
+
+    public LocalDate getDeletionDate(){
+        return deletionDate.get();
+    }
+
+    public void setDeletionDate(LocalDate deletionDate){
+        this.deletionDate.set(deletionDate);
+    }
+
+    public LocalDate getArchiveDate(){
+        return archiveDate.get();
+    }
+    public void setArchiveDate(LocalDate archiveDate) {
+        this.archiveDate.set(archiveDate);
+    }
+
+
     public String toString() {
         return "\nBehandlung" + "\nTID: " + this.tid + "\nPID: " + this.pid + "\nDate: " + this.date + "\nBegin: " +
                 this.begin + "\nEnd: " + this.end + "\nDescription: " + this.description + "\nRemarks: " +
-                this.remarks + "\nNurse" + "\nNID:" + this.nid + "\n";
+                this.remarks + "\nNurse" + "\nNID:" + this.nid  + "\nStatus: " + this.status +
+                "\nDatum gelöscht: " + this.deletionDate +"\nDatum archiviert: " + this.archiveDate + "\n";
     }
 
     public void setNid(long nid) {
+        this.nid = nid;
+    }
+    public void markForDeletion() {
+        this.status.set(STATUS_INACTIVE); // optional
+        this.archiveDate.set(LocalDate.now());
+        this.deletionDate.set(LocalDate.now().plusYears(10));
 
     }
+
 }
