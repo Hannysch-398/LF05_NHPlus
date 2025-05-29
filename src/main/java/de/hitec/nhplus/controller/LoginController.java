@@ -1,5 +1,6 @@
 package de.hitec.nhplus.controller;
 import de.hitec.nhplus.Main;
+import de.hitec.nhplus.controller.MainWindowController;
 import de.hitec.nhplus.utils.Session;
 import javafx.fxml.FXMLLoader;
 import de.hitec.nhplus.datastorage.DaoFactory;
@@ -68,6 +69,8 @@ public class LoginController {
             BorderPane pane = loader.load();
 
             Scene scene = new Scene(pane);
+            MainWindowController mainController = loader.getController();
+            mainController.setLoggedInUser(Session.getCurrentUsername());
             Stage stage = (Stage) usernameField.getScene().getWindow();
             stage.setTitle("NHPlus");
             stage.setScene(scene);

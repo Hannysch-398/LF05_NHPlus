@@ -13,16 +13,19 @@ import de.hitec.nhplus.datastorage.NurseDao;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.awt.*;
 import java.io.IOException;
 import java.sql.SQLException;
 
 public class MainWindowController {
+
 
     @FXML
     private BorderPane mainBorderPane;
@@ -140,5 +143,13 @@ public class MainWindowController {
             e.printStackTrace();
         }
     }
+    @FXML
+    private Label loggedInUserLabel;
+
+    public void setLoggedInUser(String username) {
+        loggedInUserLabel.setText(username);
+    }
+
+
 
 }
