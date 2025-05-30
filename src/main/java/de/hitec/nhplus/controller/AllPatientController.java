@@ -3,6 +3,7 @@ package de.hitec.nhplus.controller;
 import de.hitec.nhplus.datastorage.DaoFactory;
 import de.hitec.nhplus.datastorage.PatientDao;
 import de.hitec.nhplus.model.Nurse;
+import de.hitec.nhplus.model.Treatment;
 import de.hitec.nhplus.utils.Session;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -138,8 +139,10 @@ public class AllPatientController {
      */
     @FXML
     public void handleOnEditFirstname(TableColumn.CellEditEvent<Patient, String> event) {
+        if (Session.isAdmin()){
         event.getRowValue().setFirstName(event.getNewValue());
-        this.doUpdate(event);
+        setChangedBy();
+        this.doUpdate(event);}
     }
 
     /**
@@ -149,8 +152,10 @@ public class AllPatientController {
      */
     @FXML
     public void handleOnEditSurname(TableColumn.CellEditEvent<Patient, String> event) {
+        if (Session.isAdmin()){
         event.getRowValue().setSurname(event.getNewValue());
-        this.doUpdate(event);
+        setChangedBy();
+        this.doUpdate(event);}
     }
 
     /**
@@ -160,8 +165,10 @@ public class AllPatientController {
      */
     @FXML
     public void handleOnEditDateOfBirth(TableColumn.CellEditEvent<Patient, String> event) {
+        if (Session.isAdmin()){
         event.getRowValue().setDateOfBirth(event.getNewValue());
-        this.doUpdate(event);
+        setChangedBy();
+        this.doUpdate(event);}
     }
 
     /**
@@ -171,8 +178,10 @@ public class AllPatientController {
      */
     @FXML
     public void handleOnEditCareLevel(TableColumn.CellEditEvent<Patient, String> event) {
+        if (Session.isAdmin()){
         event.getRowValue().setCareLevel(event.getNewValue());
-        this.doUpdate(event);
+        setChangedBy();
+        this.doUpdate(event);}
     }
 
     /**
@@ -182,8 +191,10 @@ public class AllPatientController {
      */
     @FXML
     public void handleOnEditRoomNumber(TableColumn.CellEditEvent<Patient, String> event) {
+        if (Session.isAdmin()){
         event.getRowValue().setRoomNumber(event.getNewValue());
-        this.doUpdate(event);
+        setChangedBy();
+        this.doUpdate(event);}
     }
 
     /**
@@ -272,7 +283,7 @@ public class AllPatientController {
 
         try {
             this.dao.create(new Patient(firstName, surname, date, careLevel, roomNumber, Patient.STATUS_ACTIVE, null,
-             null       ));
+             null,null,null));
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
@@ -289,7 +300,6 @@ public class AllPatientController {
         this.textFieldDateOfBirth.clear();
         this.textFieldCareLevel.clear();
         this.textFieldRoomNumber.clear();
-        //  this.textFieldAssets.clear();
     }
 
     private boolean areInputDataValid() {
@@ -304,5 +314,9 @@ public class AllPatientController {
         return !this.textFieldFirstName.getText().isBlank() && !this.textFieldSurname.getText().isBlank() &&
                 !this.textFieldDateOfBirth.getText().isBlank() && !this.textFieldCareLevel.getText().isBlank() &&
                 !this.textFieldRoomNumber.getText().isBlank();
+    }
+    private void setChangedBy(){
+        Patient patient = tableView.getSelectionModel().getSelectedItem();
+        patient.setChangedBy(Session.getCurrentUser().getUsername());
     }
 }

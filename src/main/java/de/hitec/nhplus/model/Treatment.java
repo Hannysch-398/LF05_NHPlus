@@ -24,6 +24,8 @@ public class Treatment {
     public static final String STATUS_INACTIVE = "i";
     private final ObjectProperty<LocalDate> deletionDate = new SimpleObjectProperty<>(null);
     private final ObjectProperty<LocalDate> archiveDate = new SimpleObjectProperty<>(null);
+    private final SimpleStringProperty changedBy = new SimpleStringProperty();
+    private final SimpleStringProperty deletedBy = new SimpleStringProperty();
 
     public String getNurseName() {
         return nurseName;
@@ -45,7 +47,7 @@ public class Treatment {
      * @param nid         Id of the nurse that did the treatment.
      */
     public Treatment(long pid, LocalDate date, LocalTime begin, LocalTime end, String description, String remarks,
-                     long nid, String status, LocalDate deletionDate, LocalDate archiveDate) {
+                     long nid, String status, LocalDate deletionDate, LocalDate archiveDate, String changedBy, String deletedBy) {
         this.pid = pid;
         this.date = date;
         this.begin = begin;
@@ -56,6 +58,8 @@ public class Treatment {
         this.status = new SimpleStringProperty(status);
         this.deletionDate.set(deletionDate);
         this.archiveDate.set(archiveDate);
+        this.changedBy.set(changedBy);
+        this.deletedBy.set(deletedBy);
     }
 
     /**
@@ -72,7 +76,7 @@ public class Treatment {
      * @param nid         Id of the nurse that did the treatment
      */
     public Treatment(long tid, long pid, LocalDate date, LocalTime begin, LocalTime end, String description,
-                     String remarks, long nid, String status, LocalDate deletionDate, LocalDate archiveDate) {
+                     String remarks, long nid, String status, LocalDate deletionDate, LocalDate archiveDate, String changedBy, String deletedBy) {
         this.tid = tid;
         this.pid = pid;
         this.date = date;
@@ -82,6 +86,8 @@ public class Treatment {
         this.remarks = remarks;
         this.nid = nid;
         this.status = new SimpleStringProperty(status);
+        this.changedBy.set(changedBy);
+        this.deletedBy.set(deletedBy);
         this.deletionDate.set(deletionDate);
         this.archiveDate.set(archiveDate);
     }
@@ -161,6 +167,18 @@ public class Treatment {
     }
     public void setArchiveDate(LocalDate archiveDate) {
         this.archiveDate.set(archiveDate);
+    }
+    public String getDeletedBy() {
+        return deletedBy.get();
+    }
+    public void setDeletedBy(String deletedBy) {
+        this.deletedBy.set(deletedBy);
+    }
+    public String getChangedBy() {
+        return changedBy.get();
+    }
+    public void setChangedBy(String changedBy) {
+        this.changedBy.set(changedBy);
     }
 
 

@@ -7,6 +7,7 @@ import de.hitec.nhplus.datastorage.PatientDao;
 import de.hitec.nhplus.datastorage.TreatmentDao;
 import de.hitec.nhplus.model.Nurse;
 import de.hitec.nhplus.model.Person;
+import de.hitec.nhplus.utils.Session;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -185,6 +186,8 @@ public class AllTreatmentController {
         Treatment selectedItem = this.treatments.get(index);
         if (selectedItem != null) {
             selectedItem.markForDeletion(); // setzt z. B. status = "i", deletionDate = +10 Jahre
+            Treatment treatment = tableView.getSelectionModel().getSelectedItem();
+            treatment.setDeletedBy(Session.getCurrentUser().getUsername());
 
             try {
                 DaoFactory.getDaoFactory().createTreatmentDao().update(selectedItem); // speichert Soft-Delete

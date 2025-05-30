@@ -38,7 +38,7 @@ public class TreatmentDao extends DaoImp<Treatment> {
 
             final String SQL =
                     "INSERT INTO treatment (pid, treatment_date, begin, end, description, remark,nid,status," +
-                            "deletionDate,archiveDate ) " + "VALUES (?, ?, ?, ?, ?, ?,?,?,?,?)";
+                            "deletionDate,archiveDate, changedBy, deletedBy ) " + "VALUES (?, ?, ?, ?, ?, ?,?,?,?,?,?,?)";
             preparedStatement = this.connection.prepareStatement(SQL);
             preparedStatement.setLong(1, treatment.getPid());
             preparedStatement.setString(2, treatment.getDate());
@@ -58,6 +58,8 @@ public class TreatmentDao extends DaoImp<Treatment> {
             } else {
                 preparedStatement.setNull(10, java.sql.Types.DATE);
             }
+            preparedStatement.setString(11, treatment.getChangedBy());
+            preparedStatement.setString(12, treatment.getDeletedBy());
 
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -104,7 +106,7 @@ public class TreatmentDao extends DaoImp<Treatment> {
             archiveDate = result.getDate("archiveDate").toLocalDate();
         }
         return new Treatment(result.getLong(1), result.getLong(2), date, begin, end, result.getString(6),
-                result.getString(7), result.getLong(8), result.getString("status"), deletionDate, archiveDate);
+                result.getString(7), result.getLong(8), result.getString("status"), deletionDate, archiveDate, result.getString("changedBy"),result.getString("deletedBy"));
     }
 
     /**
@@ -150,10 +152,34 @@ public class TreatmentDao extends DaoImp<Treatment> {
             if (sqlArchiveDate != null) {
                 archiveDate = sqlArchiveDate.toLocalDate();
             }
-            Treatment treatment =
-                    new Treatment(result.getLong(1), result.getLong(2), date, begin, end, result.getString(6),
-                            result.getString(7), result.getLong(8), result.getString("status"), deletionDate,
-                            archiveDate);
+            /*Treatment treatment =
+                    new Treatment(result.getLong(1),
+                            result.getLong(2),
+                            date, begin, end,
+                            result.getString(6),
+                            result.getString(7),
+                            result.getLong(8),
+                            result.getString("status"),
+                            deletionDate,
+                            archiveDate),
+                            result.getString("changedBy"),
+                            result.getString("deletedBy")
+            );*/
+            Treatment treatment = new Treatment(
+                    result.getLong("tid"),
+                    result.getLong("pid"),
+                    date,
+                    begin,
+                    end,
+                    result.getString("description"),
+                    result.getString("remark"),
+                    result.getLong("nid"),
+                    result.getString("status"),
+                    deletionDate,
+                    archiveDate,
+                    result.getString("changedBy"),
+                    result.getString("deletedBy")
+            );
             list.add(treatment);
         }
         return list;
@@ -204,7 +230,7 @@ public class TreatmentDao extends DaoImp<Treatment> {
             final String SQL =
                     "UPDATE treatment SET " + "pid = ?, " + "treatment_date = ?, " + "begin = ?, " + "end = ?, " +
                             "description = ?, " + "remark = ?, " + "nid = ?," +"status = ?, "+"deletionDate = ?,"+
-                            "archiveDate=?" + "WHERE tid = ?";
+                            "archiveDate=?, changedBy = ?, deletedBy = ?" + "WHERE tid = ?";
             preparedStatement = this.connection.prepareStatement(SQL);
             preparedStatement.setLong(1, treatment.getPid());
             preparedStatement.setString(2, treatment.getDate());
@@ -226,8 +252,10 @@ public class TreatmentDao extends DaoImp<Treatment> {
             } else {
                 preparedStatement.setNull(10, java.sql.Types.DATE);
             }
+            preparedStatement.setString(11, treatment.getChangedBy());
+            preparedStatement.setString(12, treatment.getDeletedBy());
 
-            preparedStatement.setLong(11, treatment.getTid()); // → WHERE tid = ?
+            preparedStatement.setLong(13, treatment.getTid()); // → WHERE tid = ?
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
