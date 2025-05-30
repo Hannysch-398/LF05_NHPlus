@@ -34,8 +34,8 @@ public class UserDao extends DaoImp<User> {
         try {
             PreparedStatement stmt = connection.prepareStatement(
 
-                    "INSERT INTO user (firstname, surname, username, password_hash) VALUES (?, ?,?,?)",
-                 "INSERT INTO user (firstName, surname, username, password_hash, role) VALUES (?, ?,?,?,?)",
+                    //             "INSERT INTO user (firstname, surname, username, password_hash,role) VALUES (?, ?,?,?,?)",
+               "INSERT INTO user (firstName, surname, username, password_hash, role) VALUES (?, ?,?,?,?)",
 
                     Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, user.getFirstName());

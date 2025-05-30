@@ -39,10 +39,8 @@ public class AllCaregiverController {
     private TableColumn<Nurse, String> columnSurname;
     @FXML
     private TableColumn<Nurse, String> columnPhoneNumber;
-    @FXML
-    private TableColumn<Nurse, String> columnStatus;
-    @FXML
-    private TableColumn<Nurse, Date> columnDeletionDate;
+
+
     @FXML
     private Button buttonEdit;
 
@@ -85,8 +83,7 @@ public class AllCaregiverController {
 
         this.columnNid.setCellValueFactory(new PropertyValueFactory<>("nid"));
 
-        this.columnStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
-        this.columnDeletionDate.setCellValueFactory(new PropertyValueFactory<>("deletionDate"));
+
 
 
         //Anzeigen der Daten
