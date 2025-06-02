@@ -162,8 +162,14 @@ public class NurseDao extends DaoImp<Nurse> {
         PreparedStatement preparedStatement = null;
         try {
             final String SQL =
-                    "UPDATE nurse SET " + "firstname = ?, " + "surname = ?, " + "phoneNumber = ?, " + "status = ?," +
-                            "deletionDate = ?, archiveDate = ?" + "WHERE nid = ?";
+                    "UPDATE nurse SET " +
+                            "firstname = ?, " +
+                            "surname = ?, " +
+                            "phoneNumber = ?, " +
+                            "status = ?, " +               // Leerzeichen nach dem Komma!
+                            "deletionDate = ?, " +         // Leerzeichen!
+                            "archiveDate = ? " +           // Leerzeichen vor WHERE!
+                            "WHERE nid = ?";
             preparedStatement = this.connection.prepareStatement(SQL);
             preparedStatement.setString(1, nurse.getFirstName());
             preparedStatement.setString(2, nurse.getSurname());
