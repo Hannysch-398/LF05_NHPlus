@@ -75,9 +75,20 @@ public class TreatmentController {
         this.textFieldEnd.setText(this.treatment.getEnd());
         this.textFieldDescription.setText(this.treatment.getDescription());
         this.textAreaRemarks.setText(this.treatment.getRemarks());
-        this.comboBoxNurseSelection.setItems(nurseSelection);
-        comboBoxNurseSelection.getSelectionModel().select(0);
+        
+        // Erst Daten laden
         this.createComboBoxDataNurse();
+        
+        // Dann ComboBox konfigurieren
+        this.comboBoxNurseSelection.setItems(nurseSelection);
+        
+        // Aktuelle Pflegekraft auswählen
+        for (Nurse nurse : nurseList) {
+            if (nurse.getNid() == treatment.getNid()) {
+                comboBoxNurseSelection.getSelectionModel().select(nurse);
+                break;
+            }
+        }
     }
 
     private void createComboBoxDataNurse() {
@@ -104,6 +115,7 @@ public class TreatmentController {
             exception.printStackTrace(); // besser: Logging verwenden
         }
     }
+
     private boolean areInputsValid() {
         try {
             LocalTime begin = DateConverter.convertStringToLocalTime(textFieldBegin.getText());
@@ -119,6 +131,7 @@ public class TreatmentController {
             return false;
         }
     }
+
     @FXML
     public void handleChange() {
         if (!areInputsValid()) {

@@ -165,7 +165,11 @@ public class Patient extends Person {
                 "\nRoomnumber: " + this.roomNumber + "\nStatus: " + this.status + "\nDatum gelöscht: " +
                 this.deletionDate + "\nDatum archiviert: " + this.archiveDate + "\n";
     }
-
+    /**
+     * Marks the patient for future deletion by setting the archive date to the current date
+     * and the deletion date to 10 years from now. Optionally sets the status to inactive.
+     * This method is typically used for soft-deletion workflows.
+     */
     public void markForDeletion() {
         this.status.set(STATUS_INACTIVE); // optional
         System.out.println(status);

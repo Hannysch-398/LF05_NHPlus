@@ -34,8 +34,7 @@ public class PatientDao extends DaoImp<Patient> {
         PreparedStatement preparedStatement = null;
         try {
             final String SQL = "INSERT INTO patient (firstname, surname, dateOfBirth, carelevel, roomnumber, status," +
-                    "deletionDate, archiveDate) " +
-                    "VALUES (?, ?, ?, ?, ? ,? , ? , ? )";
+                    "deletionDate, archiveDate) " + "VALUES (?, ?, ?, ?, ? ,? , ? , ? )";
             preparedStatement = this.connection.prepareStatement(SQL);
             preparedStatement.setString(1, patient.getFirstName());
             preparedStatement.setString(2, patient.getSurname());
@@ -103,7 +102,7 @@ public class PatientDao extends DaoImp<Patient> {
         }
         return new Patient(result.getInt(1), result.getString("firstname"), result.getString("surname"),
                 DateConverter.convertStringToLocalDate(result.getString(4)), result.getString("careLevel"),
-                result.getString("roomnumber"), result.getString("status"),deletionDate,archiveDate );
+                result.getString("roomnumber"), result.getString("status"), deletionDate, archiveDate);
     }
 
     /**
@@ -152,9 +151,9 @@ public class PatientDao extends DaoImp<Patient> {
 
             Patient patient =
                     new Patient((result.getInt(1)), result.getString("firstname"), result.getString("surname"),
-                            DateConverter.convertStringToLocalDate(result.getString("dateOfBirth")), result.getString(
-                                    "careLevel"),
-                            result.getString("roomnumber"), result.getString("status"),deletionDate,archiveDate );
+                            DateConverter.convertStringToLocalDate(result.getString("dateOfBirth")),
+                            result.getString("careLevel"), result.getString("roomnumber"), result.getString("status"),
+                            deletionDate, archiveDate);
             list.add(patient);
         }
         return list;
@@ -172,7 +171,7 @@ public class PatientDao extends DaoImp<Patient> {
         PreparedStatement preparedStatement = null;
         try {
             final String SQL = "UPDATE patient SET " + "firstname = ?, " + "surname = ?, " + "dateOfBirth = ?, " +
-                    "carelevel = ?, " + "roomnumber = ?, "+ "status = ?,"+"deletionDate = ?,"+"archiveDate= ? " +
+                    "carelevel = ?, " + "roomnumber = ?, " + "status = ?," + "deletionDate = ?," + "archiveDate= ? " +
                     "WHERE pid = ?";
             /* +
                     "assets = ? "*/
@@ -224,6 +223,13 @@ public class PatientDao extends DaoImp<Patient> {
         return preparedStatement;
     }
 
+    /**
+     * Generates a <code>PreparedStatement</code> to mark a patient as inactive.
+     * This is a soft-deletion by setting the <code>active</code> column to 'i'.
+     *
+     * @param pid ID of the patient to deactivate.
+     * @return <code>PreparedStatement</code> to update the patient's active status.
+     */
     @Override
     protected PreparedStatement getDeactivateStatement(long pid) {
         PreparedStatement preparedStatement = null;
@@ -237,6 +243,14 @@ public class PatientDao extends DaoImp<Patient> {
         return preparedStatement;
     }
 
+    /**
+     * Generates a <code>PreparedStatement</code> to set the deletion and archive dates
+     * of a patient identified by the given ID. The archive date is set to the current date,
+     * the deletion date is set 10 years in the future.
+     *
+     * @param pid ID of the patient to update.
+     * @return <code>PreparedStatement</code> to update the deletion and archive dates.
+     */
     @Override
     protected PreparedStatement setDeleteDateStatement(long pid) {
         PreparedStatement preparedStatement = null;
@@ -251,6 +265,14 @@ public class PatientDao extends DaoImp<Patient> {
         }
         return preparedStatement;
     }
+
+    /**
+     * Deletes all patients from the database whose deletion date has passed,
+     * are not active anymore, and have a non-null deletion date.
+     * This is a hard delete.
+     *
+     * @throws SQLException If an error occurs during SQL execution.
+     */
     public void deleteExpiredPatient() throws SQLException {
         final String SQL = "DELETE FROM patient " + "WHERE deletionDate IS NOT NULL " + "AND deletionDate <= ? " +
                 "AND status != ?";  // Nur wenn NICHT aktiv
@@ -263,7 +285,6 @@ public class PatientDao extends DaoImp<Patient> {
             System.out.println("Anzahl gelöschter inaktiver Patienten mit abgelaufenem Löschdatum: " + deleted);
         }
     }
-
 
 
 }

@@ -33,9 +33,9 @@ public class NurseDao extends DaoImp<Nurse> {
     protected PreparedStatement getCreateStatement(Nurse nurse) {
         PreparedStatement preparedStatement = null;
         try {
-            final String SQL = "INSERT INTO nurse (firstname, surname, phoneNumber,status,deletionDate,archiveDate) " +
-                    "VALUES " +
-                    "(?, ?, ?,?,?,?)";
+            final String SQL =
+                    "INSERT INTO nurse (firstname, surname, phoneNumber,status,deletionDate,archiveDate) " + "VALUES " +
+                            "(?, ?, ?,?,?,?)";
             preparedStatement = this.connection.prepareStatement(SQL);
             preparedStatement.setString(1, nurse.getFirstName());
             preparedStatement.setString(2, nurse.getSurname());
@@ -95,15 +95,8 @@ public class NurseDao extends DaoImp<Nurse> {
             archiveDate = result.getDate("archiveDate").toLocalDate();
         }
 
-        return new Nurse(
-                result.getLong("nid"),
-                result.getString("firstname"),
-                result.getString("surname"),
-                result.getString("phoneNumber"),
-                result.getString("status"),
-                deletionDate,
-                archiveDate
-        );
+        return new Nurse(result.getLong("nid"), result.getString("firstname"), result.getString("surname"),
+                result.getString("phoneNumber"), result.getString("status"), deletionDate, archiveDate);
     }
 
     /**
@@ -148,15 +141,8 @@ public class NurseDao extends DaoImp<Nurse> {
                 archiveDate = sqlArchiveDate.toLocalDate();
             }
 
-            Nurse nurse = new Nurse(
-                    result.getLong("nid"),
-                    result.getString("firstname"),
-                    result.getString("surname"),
-                    result.getString("phoneNumber"),
-                    result.getString("status"),
-                    deletionDate,
-                    archiveDate
-            );
+            Nurse nurse = new Nurse(result.getLong("nid"), result.getString("firstname"), result.getString("surname"),
+                    result.getString("phoneNumber"), result.getString("status"), deletionDate, archiveDate);
 
             list.add(nurse);
         }
@@ -223,6 +209,13 @@ public class NurseDao extends DaoImp<Nurse> {
         return preparedStatement;
     }
 
+    /**
+     * Generates a <code>PreparedStatement</code> to mark a nurse as inactive.
+     * This is a soft-deletion by setting the <code>active</code> column to 'i'.
+     *
+     * @param nid ID of the nurse to deactivate.
+     * @return <code>PreparedStatement</code> to update the nurse's active status.
+     */
     @Override
     protected PreparedStatement getDeactivateStatement(long nid) {
         PreparedStatement preparedStatement = null;
@@ -235,6 +228,15 @@ public class NurseDao extends DaoImp<Nurse> {
         }
         return preparedStatement;
     }
+
+    /**
+     * Generates a <code>PreparedStatement</code> to set the deletion and archive dates
+     * of a nurse identified by the given ID. The archive date is set to the current date,
+     * the deletion date is set 10 years in the future.
+     *
+     * @param nid ID of the nurse to update.
+     * @return <code>PreparedStatement</code> to update the deletion and archive dates.
+     */
     @Override
     protected PreparedStatement setDeleteDateStatement(long nid) {
         PreparedStatement preparedStatement = null;
@@ -250,7 +252,13 @@ public class NurseDao extends DaoImp<Nurse> {
         return preparedStatement;
     }
 
-
+    /**
+     * Deletes all nurses from the database whose deletion date has passed,
+     * are not active anymore, and have a non-null deletion date.
+     * This is a hard delete.
+     *
+     * @throws SQLException If an error occurs during SQL execution.
+     */
     public void deleteExpiredNurses() throws SQLException {
         final String SQL = "DELETE FROM nurse " + "WHERE deletionDate IS NOT NULL " + "AND deletionDate <= ? " +
                 "AND status != ?";  // Nur wenn NICHT aktiv
