@@ -5,6 +5,7 @@ import de.hitec.nhplus.datastorage.PatientDao;
 import de.hitec.nhplus.model.Nurse;
 import de.hitec.nhplus.model.Treatment;
 import de.hitec.nhplus.utils.Session;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -19,6 +20,8 @@ import de.hitec.nhplus.model.User;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
 
@@ -110,27 +113,89 @@ public class AllPatientController {
         this.buttonDelete.setDisable(true);
         this.tableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Patient>() {
             @Override
-            public void changed(ObservableValue<? extends Patient> observableValue, Patient oldPatient, Patient newPatient) {;
-         //Prüfen ob als admin eingeloggt wurde
-                if (Session.isAdmin()){
-                AllPatientController.this.buttonDelete.setDisable(newPatient == null);}
+            public void changed(ObservableValue<? extends Patient> observableValue, Patient oldPatient,
+                                Patient newPatient) {
+                ;
+                //Prüfen ob als admin eingeloggt wurde
+                if (Session.isAdmin()) {
+                    AllPatientController.this.buttonDelete.setDisable(newPatient == null);
+                }
 
             }
         });
         this.buttonAdd.setDisable(true);
 
-        if (Session.isAdmin()){
-        ChangeListener<String> inputNewPatientListener = (observableValue, oldText, newText) ->
-                AllPatientController.this.buttonAdd.setDisable(!AllPatientController.this.areInputDataValid());
+        if (Session.isAdmin()) {
+            ChangeListener<String> inputNewPatientListener =
+                    (observableValue, oldText, newText) -> AllPatientController.this.buttonAdd.setDisable(
+                            !AllPatientController.this.areInputDataValid());
+            setNumericInput(this.textFieldRoomNumber);
+            setNumericInput(this.textFieldCareLevel);
+            setBirthDateFormatter(textFieldDateOfBirth);
 
-        this.textFieldSurname.textProperty().addListener(inputNewPatientListener);
-        this.textFieldFirstName.textProperty().addListener(inputNewPatientListener);
-        this.textFieldDateOfBirth.textProperty().addListener(inputNewPatientListener);
-        this.textFieldCareLevel.textProperty().addListener(inputNewPatientListener);
-        this.textFieldRoomNumber.textProperty().addListener(inputNewPatientListener);
+            this.textFieldSurname.textProperty().addListener(inputNewPatientListener);
+            this.textFieldFirstName.textProperty().addListener(inputNewPatientListener);
+            this.textFieldDateOfBirth.textProperty().addListener(inputNewPatientListener);
+            this.textFieldCareLevel.textProperty().addListener(inputNewPatientListener);
+            this.textFieldRoomNumber.textProperty().addListener(inputNewPatientListener);
 
-    }}
+        }
+    }
 
+    /**
+     * Setzt einen TextFormatter auf das gegebene TextField, der zwei Datumsformate akzeptiert:
+     * - yyyy-MM-dd (z. B. 1985-12-01)
+     * - dd.MM.yyyy (z. B. 01.12.1985)
+     * <p>
+     * Alle gültigen Eingaben werden automatisch ins Format yyyy-MM-dd konvertiert.
+     *
+     * @param field das TextField für das Geburtsdatum
+     */
+    private void setBirthDateFormatter(TextField field) {
+        field.setTextFormatter(new TextFormatter<>(change -> {
+            String newText = change.getControlNewText().trim();
+
+            // Eingabe erstmal zulassen
+            if (newText.isEmpty() || newText.length() < 10) {
+                return change;
+            }
+
+            // Wenn Format yyyy-MM-dd und gültig → übernehmen
+            if (newText.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                try {
+                    LocalDate.parse(newText, DateTimeFormatter.ISO_LOCAL_DATE);
+                    return change;
+                } catch (DateTimeParseException e) {
+                    return null;
+                }
+            }
+
+            // Wenn Format dd.MM.yyyy → umwandeln in yyyy-MM-dd
+            if (newText.matches("\\d{2}\\.\\d{2}\\.\\d{4}")) {
+                try {
+                    LocalDate parsed = LocalDate.parse(newText, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                    Platform.runLater(() -> field.setText(parsed.toString())); // async setzen
+                    return null;
+                } catch (DateTimeParseException e) {
+                    return null;
+                }
+            }
+
+            // alles andere ablehnen, aber nicht sofort beim Tippen
+            return change;
+        }));
+    }
+
+
+    private void setNumericInput(TextField field) {
+        field.setTextFormatter(new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+            if (newText.matches("\\d*")) { // beliebig viele Ziffern erlaubt
+                return change;
+            }
+            return null;
+        }));
+    }
 
     /**
      * When a cell of the column with first names was changed, this method will be called, to persist the change.
@@ -139,10 +204,11 @@ public class AllPatientController {
      */
     @FXML
     public void handleOnEditFirstname(TableColumn.CellEditEvent<Patient, String> event) {
-        if (Session.isAdmin()){
-        event.getRowValue().setFirstName(event.getNewValue());
-        setChangedBy();
-        this.doUpdate(event);}
+        if (Session.isAdmin()) {
+            event.getRowValue().setFirstName(event.getNewValue());
+            setChangedBy();
+            this.doUpdate(event);
+        }
     }
 
     /**
@@ -152,10 +218,11 @@ public class AllPatientController {
      */
     @FXML
     public void handleOnEditSurname(TableColumn.CellEditEvent<Patient, String> event) {
-        if (Session.isAdmin()){
-        event.getRowValue().setSurname(event.getNewValue());
-        setChangedBy();
-        this.doUpdate(event);}
+        if (Session.isAdmin()) {
+            event.getRowValue().setSurname(event.getNewValue());
+            setChangedBy();
+            this.doUpdate(event);
+        }
     }
 
     /**
@@ -165,10 +232,11 @@ public class AllPatientController {
      */
     @FXML
     public void handleOnEditDateOfBirth(TableColumn.CellEditEvent<Patient, String> event) {
-        if (Session.isAdmin()){
-        event.getRowValue().setDateOfBirth(event.getNewValue());
-        setChangedBy();
-        this.doUpdate(event);}
+        if (Session.isAdmin()) {
+            event.getRowValue().setDateOfBirth(event.getNewValue());
+            setChangedBy();
+            this.doUpdate(event);
+        }
     }
 
     /**
@@ -178,10 +246,11 @@ public class AllPatientController {
      */
     @FXML
     public void handleOnEditCareLevel(TableColumn.CellEditEvent<Patient, String> event) {
-        if (Session.isAdmin()){
-        event.getRowValue().setCareLevel(event.getNewValue());
-        setChangedBy();
-        this.doUpdate(event);}
+        if (Session.isAdmin()) {
+            event.getRowValue().setCareLevel(event.getNewValue());
+            setChangedBy();
+            this.doUpdate(event);
+        }
     }
 
     /**
@@ -191,10 +260,11 @@ public class AllPatientController {
      */
     @FXML
     public void handleOnEditRoomNumber(TableColumn.CellEditEvent<Patient, String> event) {
-        if (Session.isAdmin()){
-        event.getRowValue().setRoomNumber(event.getNewValue());
-        setChangedBy();
-        this.doUpdate(event);}
+        if (Session.isAdmin()) {
+            event.getRowValue().setRoomNumber(event.getNewValue());
+            setChangedBy();
+            this.doUpdate(event);
+        }
     }
 
     /**
@@ -282,8 +352,9 @@ public class AllPatientController {
         String roomNumber = this.textFieldRoomNumber.getText();
 
         try {
-            this.dao.create(new Patient(firstName, surname, date, careLevel, roomNumber, Patient.STATUS_ACTIVE, null,
-             null,null,null));
+            this.dao.create(
+                    new Patient(firstName, surname, date, careLevel, roomNumber, Patient.STATUS_ACTIVE, null, null,
+                            null, null));
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
@@ -315,7 +386,8 @@ public class AllPatientController {
                 !this.textFieldDateOfBirth.getText().isBlank() && !this.textFieldCareLevel.getText().isBlank() &&
                 !this.textFieldRoomNumber.getText().isBlank();
     }
-    private void setChangedBy(){
+
+    private void setChangedBy() {
         Patient patient = tableView.getSelectionModel().getSelectedItem();
         patient.setChangedBy(Session.getCurrentUser().getUsername());
     }
