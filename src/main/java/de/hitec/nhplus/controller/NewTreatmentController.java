@@ -21,17 +21,32 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Controller-Klasse für das Fenster zum Anlegen einer neuen Behandlung.
+ * <p>
+ * Verknüpft Patientendaten mit Eingaben zum Behandlungszeitraum, Beschreibung und betreuender Pflegekraft.
+ * Validiert Formulareingaben und speichert die neue Behandlung in der Datenbank.
+ */
 public class NewTreatmentController {
 
-    @FXML private Label labelFirstName;
-    @FXML private Label labelSurname;
-    @FXML private TextField textFieldBegin;
-    @FXML private TextField textFieldEnd;
-    @FXML private TextField textFieldDescription;
-    @FXML private TextArea textAreaRemarks;
-    @FXML private DatePicker datePicker;
-    @FXML private Button buttonAdd;
-    @FXML private ComboBox<Nurse> comboBoxNurseSelection;
+    @FXML
+    private Label labelFirstName;
+    @FXML
+    private Label labelSurname;
+    @FXML
+    private TextField textFieldBegin;
+    @FXML
+    private TextField textFieldEnd;
+    @FXML
+    private TextField textFieldDescription;
+    @FXML
+    private TextArea textAreaRemarks;
+    @FXML
+    private DatePicker datePicker;
+    @FXML
+    private Button buttonAdd;
+    @FXML
+    private ComboBox<Nurse> comboBoxNurseSelection;
 
     private AllTreatmentController controller;
     private Patient patient;
@@ -40,6 +55,14 @@ public class NewTreatmentController {
     private final ObservableList<Nurse> nurseSelection = FXCollections.observableArrayList();
     private List<Nurse> nurseList;
 
+    /**
+     * Initializes the treatment form, displays the patient data,
+     * loads available nurses from the database, and pre-fills date and time fields.
+     *
+     * @param controller the calling controller for table refresh after saving
+     * @param stage      the current window (closed after success or cancel)
+     * @param patient    the patient to whom the treatment will be assigned
+     */
     public void initialize(AllTreatmentController controller, Stage stage, Patient patient) {
         this.controller = controller;
         this.patient = patient;
@@ -51,6 +74,11 @@ public class NewTreatmentController {
         datePicker.setValue(LocalDate.now());
     }
 
+    /**
+     * Sets up form validation rules:
+     * - Enables the submit button only if all fields are valid
+     * - Adds a custom date converter for localized input format handling
+     */
     private void setupFormValidation() {
         buttonAdd.setDisable(true);
 
@@ -75,11 +103,18 @@ public class NewTreatmentController {
         });
     }
 
+    /**
+     * Displays the selected patient's first and last name in the form.
+     */
     private void showPatientData() {
         labelFirstName.setText(patient.getFirstName());
         labelSurname.setText(patient.getSurname());
     }
 
+    /**
+     * Loads all nurses from the database and populates the selection combo box.
+     * Configures the display of nurse names in "Last name, First name" format.
+     */
     private void createComboBoxDataNurse() {
         NurseDao dao = DaoFactory.getDaoFactory().createNurseDAO();
         try {
@@ -100,9 +135,15 @@ public class NewTreatmentController {
             });
 
         } catch (SQLException e) {
-            e.printStackTrace(); // besser: Logging
+            e.printStackTrace();
         }
     }
+
+    /**
+     * Triggered when the user confirms the treatment creation.
+     * Validates inputs, constructs a {@link Treatment} object, and stores it in the database.
+     * Closes the window on success.
+     */
 
     @FXML
     public void handleAdd() {
@@ -118,37 +159,50 @@ public class NewTreatmentController {
         String description = textFieldDescription.getText();
         String remarks = textAreaRemarks.getText();
 
-        Treatment treatment = new Treatment(
-                patient.getPid(), date, begin, end, description, remarks, selectedNurse.getNid(),
-                Treatment.STATUS_ACTIVE,null, null,null,null
-        );
+        Treatment treatment =
+                new Treatment(patient.getPid(), date, begin, end, description, remarks, selectedNurse.getNid(),
+                        Treatment.STATUS_ACTIVE, null, null, null, null);
         createTreatment(treatment);
 
         controller.readAllAndShowInTableView();
         stage.close();
     }
 
+    /**
+     * Persists the given treatment object to the database using {@link TreatmentDao}.
+     *
+     * @param treatment the treatment object to store
+     */
     private void createTreatment(Treatment treatment) {
         TreatmentDao dao = DaoFactory.getDaoFactory().createTreatmentDao();
         try {
             dao.create(treatment);
         } catch (SQLException exception) {
-            exception.printStackTrace(); // besser: Logging + Fehlermeldung anzeigen
+            exception.printStackTrace();
         }
     }
 
+    /**
+     * Closes the current form without saving any data.
+     */
     @FXML
     public void handleCancel() {
         stage.close();
     }
 
+    /**
+     * Validates form input:
+     * - Ensures required fields are not empty
+     * - Verifies time values are valid and end time is after start time
+     *
+     * @return true if input is invalid, false otherwise
+     */
     private boolean areInputDataInvalid() {
         try {
             LocalTime begin = DateConverter.convertStringToLocalTime(textFieldBegin.getText());
             LocalTime end = DateConverter.convertStringToLocalTime(textFieldEnd.getText());
-            return datePicker.getValue() == null ||
-                    textFieldDescription.getText().isBlank() ||
-                    begin == null || end == null || !end.isAfter(begin);
+            return datePicker.getValue() == null || textFieldDescription.getText().isBlank() || begin == null ||
+                    end == null || !end.isAfter(begin);
         } catch (Exception e) {
             return true;
         }

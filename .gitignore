@@ -11,6 +11,8 @@ target/
 *.iml
 *.ipr
 .db/
+db/nursingHome.db
+db/*.db
 
 ### Eclipse ###
 .apt_generated

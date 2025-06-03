@@ -89,9 +89,9 @@ public class AllPatientController {
 
         this.columnId.setCellValueFactory(new PropertyValueFactory<>("pid"));
 
-        // CellValueFactory to show property values in TableView
+
         this.columnFirstName.setCellValueFactory(new PropertyValueFactory<>("firstName"));
-        // CellFactory to write property values from with in the TableView
+
         this.columnFirstName.setCellFactory(TextFieldTableCell.forTableColumn());
 
         this.columnSurname.setCellValueFactory(new PropertyValueFactory<>("surname"));
@@ -107,7 +107,6 @@ public class AllPatientController {
         this.columnRoomNumber.setCellFactory(TextFieldTableCell.forTableColumn());
 
 
-        //Anzeigen der Daten
         this.tableView.setItems(this.patients);
 
         this.buttonDelete.setDisable(true);
@@ -116,7 +115,7 @@ public class AllPatientController {
             public void changed(ObservableValue<? extends Patient> observableValue, Patient oldPatient,
                                 Patient newPatient) {
                 ;
-                //Prüfen ob als admin eingeloggt wurde
+
                 if (Session.isAdmin()) {
                     AllPatientController.this.buttonDelete.setDisable(newPatient == null);
                 }
@@ -143,24 +142,23 @@ public class AllPatientController {
     }
 
     /**
-     * Setzt einen TextFormatter auf das gegebene TextField, der zwei Datumsformate akzeptiert:
-     * - yyyy-MM-dd (z. B. 1985-12-01)
-     * - dd.MM.yyyy (z. B. 01.12.1985)
+     * Sets a {@link TextFormatter} on the given {@link TextField} to allow two valid date formats:
+     * - yyyy-MM-dd (e.g., 1985-12-01)
+     * - dd.MM.yyyy (e.g., 01.12.1985)
      * <p>
-     * Alle gültigen Eingaben werden automatisch ins Format yyyy-MM-dd konvertiert.
+     * If a valid input in dd.MM.yyyy is detected, it will be automatically converted to yyyy-MM-dd.
      *
-     * @param field das TextField für das Geburtsdatum
+     * @param field the {@link TextField} for entering a birth date
      */
     private void setBirthDateFormatter(TextField field) {
         field.setTextFormatter(new TextFormatter<>(change -> {
             String newText = change.getControlNewText().trim();
 
-            // Eingabe erstmal zulassen
+
             if (newText.isEmpty() || newText.length() < 10) {
                 return change;
             }
 
-            // Wenn Format yyyy-MM-dd und gültig → übernehmen
             if (newText.matches("\\d{4}-\\d{2}-\\d{2}")) {
                 try {
                     LocalDate.parse(newText, DateTimeFormatter.ISO_LOCAL_DATE);
@@ -186,11 +184,17 @@ public class AllPatientController {
         }));
     }
 
-
+    /**
+     * Sets a {@link TextFormatter} on the given {@link TextField} to restrict input to numeric characters (digits
+     * only).
+     * This ensures that the user can only enter numbers, which is useful for fields like phone numbers or IDs.
+     *
+     * @param field the {@link TextField} that should accept only numeric input
+     */
     private void setNumericInput(TextField field) {
         field.setTextFormatter(new TextFormatter<>(change -> {
             String newText = change.getControlNewText();
-            if (newText.matches("\\d*")) { // beliebig viele Ziffern erlaubt
+            if (newText.matches("\\d*")) {
                 return change;
             }
             return null;
@@ -290,16 +294,6 @@ public class AllPatientController {
 
     }
 
-    /**
-     * When a cell of the column with assets was changed, this method will be called, to persist the change.
-     *
-     * @param event Event including the changed object and the change.
-     */
-   /* @FXML
-    public void handleOnEditAssets(TableColumn.CellEditEvent<Patient, String> event){
-        event.getRowValue().setAssets(event.getNewValue());
-        this.doUpdate(event);
-    }*/
 
     /**
      * Updates a patient by calling the method <code>update()</code> of {@link PatientDao}.
@@ -337,7 +331,7 @@ public class AllPatientController {
     public void handleMarkForDelete() {
         Patient selectedItem = this.tableView.getSelectionModel().getSelectedItem();
         System.out.println(selectedItem);
-        // Sicherheitsabfrage
+
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle("Löschen bestätigen");
         confirmAlert.setHeaderText("Sind Sie sicher?");
@@ -345,7 +339,7 @@ public class AllPatientController {
         setDeletedBy();
         Optional<ButtonType> result = confirmAlert.showAndWait();
         if (result.isEmpty() || result.get() != ButtonType.OK) {
-            // Abgebrochen
+
             return;
         }
         if (selectedItem != null) {
@@ -397,6 +391,14 @@ public class AllPatientController {
         this.textFieldRoomNumber.clear();
     }
 
+    /**
+     * Validates whether the input fields for creating a new patient contain valid data.
+     * Specifically checks that:
+     * - No required field is blank
+     * - The birth date is parsable into a {@link LocalDate}
+     *
+     * @return true if all input fields are valid, false otherwise
+     */
     private boolean areInputDataValid() {
         if (!this.textFieldDateOfBirth.getText().isBlank()) {
             try {
@@ -411,6 +413,12 @@ public class AllPatientController {
                 !this.textFieldRoomNumber.getText().isBlank();
     }
 
+
+    /**
+     * Sets the {@code changedBy} field of the currently selected patient
+     * to the username of the currently logged-in user from the {@link Session}.
+     */
+
     private void showNotAuthorizedAlert() {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Keine Berechtigung");
@@ -419,6 +427,7 @@ public class AllPatientController {
         alert.showAndWait();
     }
     private void setChangedBy(){
+
 
         Patient patient = tableView.getSelectionModel().getSelectedItem();
         patient.setChangedBy(Session.getCurrentUser().getUsername());

@@ -28,6 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The {@code AllTreatmentController} class manages the treatment overview view.
+ * It handles displaying, filtering, adding, editing, and soft-deleting treatments,
+ * as well as initializing UI elements like the ComboBox and TableView.
+ */
 public class AllTreatmentController {
 
     @FXML
@@ -61,11 +66,17 @@ public class AllTreatmentController {
     @FXML
     private Button buttonDelete;
 
-    private static final Logger LOG = LoggerFactory.getLogger(AllTreatmentController.class);
+
     private final ObservableList<Treatment> treatments = FXCollections.observableArrayList();
     private TreatmentDao dao;
     private final ObservableList<String> patientSelection = FXCollections.observableArrayList();
     private List<Patient> patientList;
+
+    /**
+     * Initializes the controller after the FXML has been loaded.
+     * Sets up column bindings, populates the ComboBox and TableView,
+     * and defines handlers for selection and double-click actions.
+     */
 
     public void initialize() {
         readAllAndShowInTableView();
@@ -81,7 +92,7 @@ public class AllTreatmentController {
         this.tableView.setItems(this.treatments);
         this.columnNurse.setCellValueFactory(new PropertyValueFactory<>("nurseName"));
 
-        // Disabling the button to delete treatments as long, as no treatment was selected.
+
         this.buttonDelete.setDisable(true);
         this.tableView.getSelectionModel().selectedItemProperty().addListener(
                 (observableValue, oldTreatment, newTreatment) -> AllTreatmentController.this.buttonDelete.setDisable(
@@ -97,6 +108,10 @@ public class AllTreatmentController {
         });
     }
 
+    /**
+     * Loads all treatments from the database, assigns nurse names to each treatment,
+     * and populates the TableView with the result.
+     */
     public void readAllAndShowInTableView() {
         this.treatments.clear();
         this.dao = DaoFactory.getDaoFactory().createTreatmentDao();
@@ -122,6 +137,10 @@ public class AllTreatmentController {
         }
     }
 
+    /**
+     * Loads all patients from the database and populates the ComboBox with their surnames.
+     * Includes an "all" option for displaying treatments from all patients.
+     */
     private void createComboBoxData() {
         PatientDao dao = DaoFactory.getDaoFactory().createPatientDAO();
         try {
@@ -129,13 +148,17 @@ public class AllTreatmentController {
 
             this.patientSelection.add("alle");
             patientList.stream().map(Person::getSurname).forEach(patientSelection::add);
-            LOG.info("got {} - {}", patientList, patientList.size());
+
         } catch (SQLException exception) {
-            LOG.error("SQL had some problems", exception);
+            exception.printStackTrace();
         }
     }
 
-
+    /**
+     * Filters the displayed treatments based on the selected patient in the ComboBox.
+     * If "all" is selected, all treatments are shown.
+     * Otherwise, only treatments for the selected patient are displayed.
+     */
     @FXML
     public void handleComboBox() {
         String selectedPatient = this.comboBoxPatientSelection.getSelectionModel().getSelectedItem();
@@ -155,6 +178,7 @@ public class AllTreatmentController {
                 }
             }
 
+
             NurseDao nurseDao = DaoFactory.getDaoFactory().createNurseDAO();
             for (Treatment treatment : filteredTreatments) {
                 Nurse nurse = nurseDao.read((int) treatment.getNid());
@@ -172,6 +196,12 @@ public class AllTreatmentController {
         }
     }
 
+    /**
+     * Searches the internal patient list for a patient with the given surname.
+     *
+     * @param surname the surname to search for
+     * @return the matching {@link Patient}, or {@code null} if not found
+     */
     private Patient searchInList(String surname) {
         for (Patient patient : this.patientList) {
             if (patient.getSurname().equals(surname)) {
@@ -181,10 +211,14 @@ public class AllTreatmentController {
         return null;
     }
 
+    /**
+     * Handles the deletion of the selected treatment by marking it as deleted.
+     * Shows a confirmation dialog and updates the {@code deletedBy} field with the current user.
+     */
     @FXML
     public void handleMarkForDelete() {
         int index = this.tableView.getSelectionModel().getSelectedIndex();
-        // Sicherheitsabfrage
+
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle("Löschen bestätigen");
         confirmAlert.setHeaderText("Sind Sie sicher?");
@@ -192,26 +226,31 @@ public class AllTreatmentController {
 
         Optional<ButtonType> result = confirmAlert.showAndWait();
         if (result.isEmpty() || result.get() != ButtonType.OK) {
-            // Abgebrochen
+
             return;
         }
 
         Treatment selectedItem = this.treatments.get(index);
         if (selectedItem != null) {
-            selectedItem.markForDeletion(); // setzt z. B. status = "i", deletionDate = +10 Jahre
+            selectedItem.markForDeletion();
             Treatment treatment = tableView.getSelectionModel().getSelectedItem();
             treatment.setDeletedBy(Session.getCurrentUser().getUsername());
             try {
                 DaoFactory.getDaoFactory().createTreatmentDao().update(selectedItem); // speichert Soft-Delete
                 readAllAndShowInTableView();
+
             } catch (SQLException exception) {
                 exception.printStackTrace();
             }
 
-            this.tableView.refresh(); // zeigt neue Daten sofort
+            this.tableView.refresh();
         }
     }
 
+    /**
+     * Opens the window to create a new treatment.
+     * Requires a patient to be selected via the ComboBox; otherwise, an info dialog is shown.
+     */
     @FXML
     public void handleNewTreatment() {
         try {
@@ -227,6 +266,9 @@ public class AllTreatmentController {
         }
     }
 
+    /**
+     * Opens the treatment edit window when a treatment row is double-clicked in the table.
+     */
     @FXML
     public void handleMouseClick() {
         tableView.setOnMouseClicked(event -> {
@@ -238,13 +280,19 @@ public class AllTreatmentController {
         });
     }
 
+    /**
+     * Opens the New Treatment window for the specified patient.
+     * Loads the FXML view, initializes the controller, and opens the modal window.
+     *
+     * @param patient the patient to assign the new treatment to
+     */
     public void newTreatmentWindow(Patient patient) {
         try {
             FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/hitec/nhplus/NewTreatmentView.fxml"));
             AnchorPane pane = loader.load();
             Scene scene = new Scene(pane);
 
-            // the primary stage should stay in the background
+
             Stage stage = new Stage();
 
             NewTreatmentController controller = loader.getController();
@@ -258,13 +306,19 @@ public class AllTreatmentController {
         }
     }
 
+    /**
+     * Opens the Treatment Edit window for the given treatment.
+     * Loads the FXML view, initializes the controller, and opens the modal window.
+     *
+     * @param treatment the treatment to edit
+     */
     public void treatmentWindow(Treatment treatment) {
         try {
             FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/hitec/nhplus/TreatmentView.fxml"));
             AnchorPane pane = loader.load();
             Scene scene = new Scene(pane);
 
-            // the primary stage should stay in the background
+
             Stage stage = new Stage();
             TreatmentController controller = loader.getController();
             controller.initializeController(this, stage, treatment);
