@@ -20,6 +20,8 @@ public class Nurse extends Person {
     public static final String STATUS_INACTIVE = "i";
     private final ObjectProperty<LocalDate> deletionDate = new SimpleObjectProperty<>(null);
     private final ObjectProperty<LocalDate> archiveDate = new SimpleObjectProperty<>(null);
+    private final SimpleStringProperty changedBy = new SimpleStringProperty();
+    private final SimpleStringProperty deletedBy = new SimpleStringProperty();
 
 
     /**
@@ -30,14 +32,18 @@ public class Nurse extends Person {
      * @param surname     Last name of the nurse.
      * @param phoneNumber phone Number of the nurse.
      */
-    public Nurse(String firstName, String surname, String phoneNumber, String status, LocalDate deletionDate,
-                 LocalDate archiveDate) {
+
+    public Nurse(String firstName, String surname, String phoneNumber, String status,
+                 LocalDate deletionDate, LocalDate archiveDate, String changedBy, String deletedBy) {
+
         super(firstName, surname);
         this.nid = new SimpleLongProperty(); // leer – DB vergibt ID später
         this.phoneNumber = new SimpleStringProperty(phoneNumber);
         this.status = new SimpleStringProperty(status);
         this.deletionDate.set(deletionDate);
         this.archiveDate.set(archiveDate);
+        this.changedBy.set(changedBy);
+        this.deletedBy.set(deletedBy);
     }
 
     /**
@@ -49,14 +55,18 @@ public class Nurse extends Person {
      * @param surname     Last name of the nurse.
      * @param phoneNumber phoneNumber of the nurse
      */
-    public Nurse(long nid, String firstName, String surname, String phoneNumber, String status, LocalDate deletionDate,
-                 LocalDate archiveDate) {
+
+    public Nurse(long nid, String firstName, String surname, String phoneNumber, String status,
+                 LocalDate deletionDate, LocalDate archiveDate, String changedBy, String deletedBy) {
+
         super(firstName, surname);
         this.nid = new SimpleLongProperty(nid);
         this.phoneNumber = new SimpleStringProperty(phoneNumber);
         this.status = new SimpleStringProperty(status);
         this.deletionDate.set(deletionDate);
         this.archiveDate.set(archiveDate);
+        this.changedBy.set(changedBy);
+        this.deletedBy.set(deletedBy);
     }
 
 
@@ -105,10 +115,37 @@ public class Nurse extends Person {
         this.archiveDate.set(archiveDate);
     }
 
+    public String getChangedBy() {
+        return changedBy.get();
+    }
+
+    public void setChangedBy(String changedBy) {
+        this.changedBy.set(changedBy);
+    }
+
+    public SimpleStringProperty changedByProperty() {
+        return changedBy;
+    }
+
+    public String getDeletedBy() {
+        return deletedBy.get();
+    }
+
+    public void setDeletedBy(String deletedBy) {
+        this.deletedBy.set(deletedBy);
+    }
+
+    public SimpleStringProperty deletedByProperty() {
+        return deletedBy;
+    }
+
     public String toString() {
         return "Pfleger/in" + "\nNID: " + this.nid + "\nFirstname: " + this.getFirstName() + "\nSurname: " +
                 this.getSurname() + "\nPhoneNumber: " + this.phoneNumber + "\nStatus: " + this.status +
-                "\nDatum gelöscht: " + this.deletionDate + "\nDatum archiviert: " + this.archiveDate + "\n";
+
+                "\nDatum gelöscht: " + this.deletionDate +"\nDatum archiviert: " + this.archiveDate +"\n" +"\nGeändert von: " + this.changedBy +
+                "\nGelöscht von: " + this.deletedBy + "\n";
+
     }
 
     /**

@@ -33,9 +33,11 @@ public class NurseDao extends DaoImp<Nurse> {
     protected PreparedStatement getCreateStatement(Nurse nurse) {
         PreparedStatement preparedStatement = null;
         try {
-            final String SQL =
-                    "INSERT INTO nurse (firstname, surname, phoneNumber,status,deletionDate,archiveDate) " + "VALUES " +
-                            "(?, ?, ?,?,?,?)";
+
+            final String SQL = "INSERT INTO nurse (firstname, surname, phoneNumber,status,deletionDate,archiveDate, changedBy, deletedBy) " +
+                    "VALUES " +
+                    "(?, ?, ?,?,?,?,?,?)";
+
             preparedStatement = this.connection.prepareStatement(SQL);
             preparedStatement.setString(1, nurse.getFirstName());
             preparedStatement.setString(2, nurse.getSurname());
@@ -51,6 +53,8 @@ public class NurseDao extends DaoImp<Nurse> {
             } else {
                 preparedStatement.setNull(6, java.sql.Types.DATE);
             }
+            preparedStatement.setString(7, nurse.getChangedBy());
+            preparedStatement.setString(8, nurse.getDeletedBy());
 
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -95,8 +99,19 @@ public class NurseDao extends DaoImp<Nurse> {
             archiveDate = result.getDate("archiveDate").toLocalDate();
         }
 
-        return new Nurse(result.getLong("nid"), result.getString("firstname"), result.getString("surname"),
-                result.getString("phoneNumber"), result.getString("status"), deletionDate, archiveDate);
+
+        return new Nurse(
+                result.getLong("nid"),
+                result.getString("firstname"),
+                result.getString("surname"),
+                result.getString("phoneNumber"),
+                result.getString("status"),
+                deletionDate,
+                archiveDate,
+                result.getString("changedBy"),
+                result.getString("deletedBy")
+        );
+
     }
 
     /**
@@ -141,8 +156,19 @@ public class NurseDao extends DaoImp<Nurse> {
                 archiveDate = sqlArchiveDate.toLocalDate();
             }
 
-            Nurse nurse = new Nurse(result.getLong("nid"), result.getString("firstname"), result.getString("surname"),
-                    result.getString("phoneNumber"), result.getString("status"), deletionDate, archiveDate);
+
+            Nurse nurse = new Nurse(
+                    result.getLong("nid"),
+                    result.getString("firstname"),
+                    result.getString("surname"),
+                    result.getString("phoneNumber"),
+                    result.getString("status"),
+                    deletionDate,
+                    archiveDate,
+                    result.getString("changedBy"),
+                    result.getString("deletedBy")
+            );
+
 
             list.add(nurse);
         }
@@ -162,14 +188,10 @@ public class NurseDao extends DaoImp<Nurse> {
         PreparedStatement preparedStatement = null;
         try {
             final String SQL =
-                    "UPDATE nurse SET " +
-                            "firstname = ?, " +
-                            "surname = ?, " +
-                            "phoneNumber = ?, " +
-                            "status = ?, " +               // Leerzeichen nach dem Komma!
-                            "deletionDate = ?, " +         // Leerzeichen!
-                            "archiveDate = ? " +           // Leerzeichen vor WHERE!
-                            "WHERE nid = ?";
+
+                    "UPDATE nurse SET " + "firstname = ?, " + "surname = ?, " + "phoneNumber = ?, " + "status = ?," +
+                            "deletionDate = ?, archiveDate = ?, changedBy = ?, deletedBy = ?" + "WHERE nid = ?";
+
             preparedStatement = this.connection.prepareStatement(SQL);
             preparedStatement.setString(1, nurse.getFirstName());
             preparedStatement.setString(2, nurse.getSurname());
@@ -188,8 +210,12 @@ public class NurseDao extends DaoImp<Nurse> {
             } else {
                 preparedStatement.setNull(6, java.sql.Types.DATE);
             }
+            preparedStatement.setString(7, nurse.getChangedBy());
+            preparedStatement.setString(8, nurse.getDeletedBy());
 
-            preparedStatement.setLong(7, nurse.getNid());
+            preparedStatement.setLong(9, nurse.getNid());
+
+
         } catch (SQLException exception) {
             exception.printStackTrace();
         }

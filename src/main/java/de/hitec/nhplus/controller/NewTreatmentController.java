@@ -120,7 +120,7 @@ public class NewTreatmentController {
 
         Treatment treatment = new Treatment(
                 patient.getPid(), date, begin, end, description, remarks, selectedNurse.getNid(),
-                Treatment.STATUS_ACTIVE,null, null
+                Treatment.STATUS_ACTIVE,null, null,null,null
         );
         createTreatment(treatment);
 

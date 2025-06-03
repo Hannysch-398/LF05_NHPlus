@@ -275,6 +275,10 @@ public class AllCaregiverController {
         }
         if (selectedItem != null) {
             selectedItem.markForDeletion(); // setzt z. B. status = "i", deletionDate = +10 Jahre
+            String currentUser = Session.getCurrentUser().getUsername();
+            Nurse nurse = tableView.getSelectionModel().getSelectedItem();
+            nurse.setDeletedBy(currentUser);
+            System.out.println(nurse.getDeletedBy());
 
             try {
                 DaoFactory.getDaoFactory().createNurseDAO().update(selectedItem); // speichert Soft-Delete
@@ -300,7 +304,7 @@ public class AllCaregiverController {
         System.out.println("handleAdd aufgerufen");
         try {
 
-            this.dao.create(new Nurse(firstName, surname, phoneNumber, Nurse.STATUS_ACTIVE, null,null));
+            this.dao.create(new Nurse(firstName, surname, phoneNumber, Nurse.STATUS_ACTIVE, null,null,null,null));
             System.out.println("Pflegekraft wird erstellt: " + firstName + " " + surname + " " + phoneNumber);
 
         } catch (SQLException exception) {
@@ -353,7 +357,10 @@ public class AllCaregiverController {
             alert.show();
             return;
         }*/
-
+        String currentUser = Session.getCurrentUser().getUsername();
+        Nurse nurse = tableView.getSelectionModel().getSelectedItem();
+        nurse.setChangedBy(currentUser);
+        System.out.println(nurse.getChangedBy());
         // Objekt aktualisieren
         if (!newFirstName.isEmpty()){
         selected.setFirstName(newFirstName);}

@@ -25,6 +25,8 @@ public class Patient extends Person {
     public static final String STATUS_INACTIVE = "i";
     private final ObjectProperty<LocalDate> deletionDate = new SimpleObjectProperty<>(null);
     private final ObjectProperty<LocalDate> archiveDate = new SimpleObjectProperty<>(null);
+    private final SimpleStringProperty changedBy = new SimpleStringProperty();
+    private final SimpleStringProperty deletedBy = new SimpleStringProperty();
 
     /**
      * Constructor to initiate an object of class <code>Patient</code> with the given parameter. Use this constructor
@@ -37,7 +39,7 @@ public class Patient extends Person {
      * @param roomNumber  Room number of the patient.
      */
     public Patient(String firstName, String surname, LocalDate dateOfBirth, String careLevel, String roomNumber,
-                   String status, LocalDate deletionDate, LocalDate archiveDate) {
+                   String status, LocalDate deletionDate, LocalDate archiveDate, String changedBy, String deletedBy) {
         super(firstName, surname);
         this.dateOfBirth = new SimpleStringProperty(DateConverter.convertLocalDateToString(dateOfBirth));
         this.careLevel = new SimpleStringProperty(careLevel);
@@ -45,6 +47,8 @@ public class Patient extends Person {
         this.status = new SimpleStringProperty(status);
         this.deletionDate.set(deletionDate);
         this.archiveDate.set(archiveDate);
+        this.changedBy.set(changedBy);
+        this.deletedBy.set(deletedBy);
     }
 
     /**
@@ -59,7 +63,7 @@ public class Patient extends Person {
      * @param roomNumber  Room number of the patient.
      */
     public Patient(long pid, String firstName, String surname, LocalDate dateOfBirth, String careLevel,
-                   String roomNumber, String status, LocalDate deletionDate, LocalDate archiveDate) {
+                   String roomNumber, String status, LocalDate deletionDate, LocalDate archiveDate, String changedBy, String deletedBy) {
         super(firstName, surname);
         this.pid = new SimpleLongProperty(pid);
         this.dateOfBirth = new SimpleStringProperty(DateConverter.convertLocalDateToString(dateOfBirth));
@@ -68,6 +72,8 @@ public class Patient extends Person {
         this.status = new SimpleStringProperty(status);
         this.deletionDate.set(deletionDate);
         this.archiveDate.set(archiveDate);
+        this.changedBy.set(changedBy);
+        this.deletedBy.set(deletedBy);
     }
 
     public long getPid() {
@@ -143,6 +149,30 @@ public class Patient extends Person {
 
     public void setArchiveDate(LocalDate archiveDate) {
         this.archiveDate.set(archiveDate);
+
+    }
+    public String getChangedBy() {
+        return changedBy.get();
+    }
+
+    public void setChangedBy(String changedBy) {
+        this.changedBy.set(changedBy);
+    }
+
+    public SimpleStringProperty changedByProperty() {
+        return changedBy;
+    }
+
+    public String getDeletedBy() {
+        return deletedBy.get();
+    }
+
+    public void setDeletedBy(String deletedBy) {
+        this.deletedBy.set(deletedBy);
+    }
+
+    public SimpleStringProperty deletedByProperty() {
+        return deletedBy;
     }
 
     /**
@@ -163,7 +193,8 @@ public class Patient extends Person {
         return "Patient" + "\nMNID: " + this.pid + "\nFirstname: " + this.getFirstName() + "\nSurname: " +
                 this.getSurname() + "\nBirthday: " + this.dateOfBirth + "\nCarelevel: " + this.careLevel +
                 "\nRoomnumber: " + this.roomNumber + "\nStatus: " + this.status + "\nDatum gelöscht: " +
-                this.deletionDate + "\nDatum archiviert: " + this.archiveDate + "\n";
+                this.deletionDate + "\nDatum archiviert: " + this.archiveDate + "\n"  + this.changedBy +
+                "\nGelöscht von: " + this.deletedBy + "\n";
     }
     /**
      * Marks the patient for future deletion by setting the archive date to the current date

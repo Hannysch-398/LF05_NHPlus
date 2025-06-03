@@ -34,7 +34,10 @@ public class PatientDao extends DaoImp<Patient> {
         PreparedStatement preparedStatement = null;
         try {
             final String SQL = "INSERT INTO patient (firstname, surname, dateOfBirth, carelevel, roomnumber, status," +
-                    "deletionDate, archiveDate) " + "VALUES (?, ?, ?, ?, ? ,? , ? , ? )";
+
+                    "deletionDate, archiveDate, changedBy, deletedBy) " +
+                    "VALUES (?, ?, ?, ?, ? ,? , ? , ? ,?,?)";
+
             preparedStatement = this.connection.prepareStatement(SQL);
             preparedStatement.setString(1, patient.getFirstName());
             preparedStatement.setString(2, patient.getSurname());
@@ -57,6 +60,8 @@ public class PatientDao extends DaoImp<Patient> {
                 System.out.println("insert spalte 81");
                 preparedStatement.setNull(8, java.sql.Types.DATE);
             }
+            preparedStatement.setString(9, patient.getChangedBy());
+            preparedStatement.setString(10, patient.getDeletedBy());
 
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -102,7 +107,10 @@ public class PatientDao extends DaoImp<Patient> {
         }
         return new Patient(result.getInt(1), result.getString("firstname"), result.getString("surname"),
                 DateConverter.convertStringToLocalDate(result.getString(4)), result.getString("careLevel"),
-                result.getString("roomnumber"), result.getString("status"), deletionDate, archiveDate);
+
+                result.getString("roomnumber"), result.getString("status"),deletionDate,archiveDate,result.getString("changedBy"),
+                result.getString("deletedBy") );
+
     }
 
     /**
@@ -149,11 +157,33 @@ public class PatientDao extends DaoImp<Patient> {
 
             LocalDate date = DateConverter.convertStringToLocalDate(result.getString(4));
 
-            Patient patient =
-                    new Patient((result.getInt(1)), result.getString("firstname"), result.getString("surname"),
+
+            /*Patient patient =
+                    new Patient((result.getInt(1)),
+                            result.getString("firstname"),
+                            result.getString("surname"),
                             DateConverter.convertStringToLocalDate(result.getString("dateOfBirth")),
-                            result.getString("careLevel"), result.getString("roomnumber"), result.getString("status"),
-                            deletionDate, archiveDate);
+                            result.getString("careLevel"),
+                            result.getString("roomnumber"),
+                            result.getString("status"),
+                            deletionDate,archiveDate )
+                            result.getString("changedBy"),
+                            result.getString("deletedBy")
+            );*/
+            Patient patient = new Patient(
+                    result.getInt("pid"),
+                    result.getString("firstname"),
+                    result.getString("surname"),
+                    DateConverter.convertStringToLocalDate(result.getString("dateOfBirth")),
+                    result.getString("careLevel"),
+                    result.getString("roomnumber"),
+                    result.getString("status"),
+                    deletionDate,
+                    archiveDate,
+                    result.getString("changedBy"),
+                    result.getString("deletedBy")
+            );
+
             list.add(patient);
         }
         return list;
@@ -171,7 +201,9 @@ public class PatientDao extends DaoImp<Patient> {
         PreparedStatement preparedStatement = null;
         try {
             final String SQL = "UPDATE patient SET " + "firstname = ?, " + "surname = ?, " + "dateOfBirth = ?, " +
-                    "carelevel = ?, " + "roomnumber = ?, " + "status = ?," + "deletionDate = ?," + "archiveDate= ? " +
+
+                    "carelevel = ?, " + "roomnumber = ?, "+ "status = ?,"+"deletionDate = ?,"+"archiveDate= ? , changedBy = ?, deletedBy = ?" +
+
                     "WHERE pid = ?";
             /* +
                     "assets = ? "*/
@@ -195,9 +227,11 @@ public class PatientDao extends DaoImp<Patient> {
             } else {
                 preparedStatement.setNull(8, java.sql.Types.DATE);
             }
+            preparedStatement.setString(9, patient.getChangedBy());
+            preparedStatement.setString(10, patient.getDeletedBy());
 
 
-            preparedStatement.setLong(9, patient.getPid());
+            preparedStatement.setLong(11, patient.getPid());
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
