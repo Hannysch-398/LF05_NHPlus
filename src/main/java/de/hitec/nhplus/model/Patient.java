@@ -76,6 +76,10 @@ public class Patient extends Person {
         this.deletedBy.set(deletedBy);
     }
 
+    /**
+     * Getter and Setter Methods
+     */
+
     public long getPid() {
         return pid.get();
     }

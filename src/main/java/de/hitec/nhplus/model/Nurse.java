@@ -69,6 +69,9 @@ public class Nurse extends Person {
         this.deletedBy.set(deletedBy);
     }
 
+    /**
+     * Getter and Setter Methods
+     */
 
     public long getNid() {
         return (nid != null) ? nid.get() : 0;

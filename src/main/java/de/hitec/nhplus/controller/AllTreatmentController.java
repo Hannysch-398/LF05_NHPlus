@@ -155,7 +155,6 @@ public class AllTreatmentController {
                 }
             }
 
-            // Pflegekraftinformationen für gefilterte Behandlungen aktualisieren
             NurseDao nurseDao = DaoFactory.getDaoFactory().createNurseDAO();
             for (Treatment treatment : filteredTreatments) {
                 Nurse nurse = nurseDao.read((int) treatment.getNid());
@@ -195,22 +194,16 @@ public class AllTreatmentController {
         if (result.isEmpty() || result.get() != ButtonType.OK) {
             // Abgebrochen
             return;
-        }/*
-        Treatment t = this.treatments.remove(index);
-        TreatmentDao dao = DaoFactory.getDaoFactory().createTreatmentDao();
-        try {
-            dao.deleteById(t.getTid());
-        } catch (SQLException exception) {
-            exception.printStackTrace();
-        }*/
+        }
+
         Treatment selectedItem = this.treatments.get(index);
         if (selectedItem != null) {
             selectedItem.markForDeletion(); // setzt z. B. status = "i", deletionDate = +10 Jahre
             Treatment treatment = tableView.getSelectionModel().getSelectedItem();
             treatment.setDeletedBy(Session.getCurrentUser().getUsername());
-
             try {
                 DaoFactory.getDaoFactory().createTreatmentDao().update(selectedItem); // speichert Soft-Delete
+                readAllAndShowInTableView();
             } catch (SQLException exception) {
                 exception.printStackTrace();
             }

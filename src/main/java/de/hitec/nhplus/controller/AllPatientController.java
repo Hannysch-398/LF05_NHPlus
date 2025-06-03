@@ -353,11 +353,12 @@ public class AllPatientController {
             selectedItem.markForDeletion();
             try {
                 DaoFactory.getDaoFactory().createPatientDAO().update(selectedItem);
+                readAllAndShowInTableView();
             } catch (SQLException exception) {
                 exception.printStackTrace();
             }
         }
-        this.tableView.refresh(); // zeigt neue Daten sofort
+
     }
 
     /**

@@ -300,20 +300,16 @@ public class AllCaregiverController {
         }
         if (selectedItem != null) {
             selectedItem.markForDeletion(); // setzt z. B. status = "i", deletionDate = +10 Jahre
-            /*String currentUser = Session.getCurrentUser().getUsername();
-            Nurse nurse = tableView.getSelectionModel().getSelectedItem();
-            nurse.setDeletedBy(currentUser);
-            System.out.println(nurse.getDeletedBy());*/
             setDeletedBy();
-            this.tableView.refresh();
+
 
             try {
                 DaoFactory.getDaoFactory().createNurseDAO().update(selectedItem); // speichert Soft-Delete
+                readAllAndShowInTableView();
             } catch (SQLException exception) {
                 exception.printStackTrace();
             }
 
-             // zeigt neue Daten sofort
         }
     }
 

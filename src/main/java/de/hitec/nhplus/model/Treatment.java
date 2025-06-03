@@ -92,6 +92,10 @@ public class Treatment {
         this.archiveDate.set(archiveDate);
     }
 
+    /**
+     * Getter and Setter Methods
+     */
+
     public long getTid() {
         return tid;
     }

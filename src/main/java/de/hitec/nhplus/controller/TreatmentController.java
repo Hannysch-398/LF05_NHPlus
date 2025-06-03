@@ -6,6 +6,7 @@ import de.hitec.nhplus.datastorage.PatientDao;
 import de.hitec.nhplus.datastorage.TreatmentDao;
 import de.hitec.nhplus.model.Nurse;
 import de.hitec.nhplus.model.Person;
+import de.hitec.nhplus.utils.Session;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -144,7 +145,7 @@ public class TreatmentController {
             new Alert(Alert.AlertType.WARNING, "Bitte eine Pflegekraft auswählen!").showAndWait();
             return;
         }
-
+        treatment.setChangedBy(Session.getCurrentUser().getUsername());
         treatment.setDate(datePicker.getValue().toString());
         treatment.setBegin(textFieldBegin.getText());
         treatment.setEnd(textFieldEnd.getText());
@@ -153,6 +154,7 @@ public class TreatmentController {
         treatment.setNid(selectedNurse.getNid());
 
         doUpdate();
+
         controller.readAllAndShowInTableView();
         stage.close();
     }
@@ -165,6 +167,7 @@ public class TreatmentController {
             exception.printStackTrace();
         }
     }
+
 
     @FXML
     public void handleCancel() {

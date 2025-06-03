@@ -30,15 +30,11 @@ public class SetUpDB {
         SetUpDB.wipeDb(connection);
         SetUpDB.setUpTablePatient(connection);
         SetUpDB.setUpTableNurse(connection);
-
         SetUpDB.setUpTableUser(connection);
-
         SetUpDB.setUpTableTreatment(connection);
-
         SetUpDB.setUpNurse();
         SetUpDB.setUpUsers();
         SetUpDB.setUpPatients();
-
         SetUpDB.setUpTreatments();
 
 
@@ -51,7 +47,6 @@ public class SetUpDB {
         try (Statement statement = connection.createStatement()) {
             statement.execute("DROP TABLE treatment");
             statement.execute("DROP TABLE patient");
-
             statement.execute("DROP TABLE nurse");
             statement.execute("DROP TABLE user");
         } catch (SQLException exception) {
@@ -216,11 +211,11 @@ public class SetUpDB {
     private static void setUpUsers() {
         try {
             UserDao dao = DaoFactory.getDaoFactory().createUserDAO();
-            dao.create(new User( 1, "Udo", "Zimmermann", "u", "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9", "admin"));
+            dao.create(new User( 1, "Udo", "Mann", "u.mann", "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9", "admin"));
             dao.create(new User( 2, "Anna","Suarez", "a.suarez", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a", ""));
             dao.create(new User( 3, "Lin","Park", "l.park", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a", ""));
-            dao.create(new User( 3, "James","Ross", "j.ross", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a", ""));
-            dao.create(new User( 3, "Michael","Berg", "m.berg", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a", ""));
+            dao.create(new User( 4, "James","Ross", "j.ross", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a", ""));
+            dao.create(new User( 5, "Michael","Berg", "m.berg", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a", ""));
         } catch (SQLException exception) {
             exception.printStackTrace();
         }

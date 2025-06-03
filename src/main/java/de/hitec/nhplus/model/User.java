@@ -9,6 +9,17 @@ public class User extends Person {
     private final SimpleStringProperty password;
     private String role;
 
+    /**
+     * Constructor for creating a user object without a specified role.
+     * Use this for login or temporary user data that doesn't require role-based logic.
+     *
+     * @param firstName   First name of the user.
+     * @param surname     Last name of the user.
+     * @param id          User ID.
+     * @param username    Username used for login.
+     * @param passwordHash Hashed password for authentication.
+     */
+
 
     public User(String firstName, String surname, long id, String username, String passwordHash) {
 
@@ -17,6 +28,17 @@ public class User extends Person {
         this.password = new SimpleStringProperty(passwordHash);
     }
 
+    /**
+     * Constructor for creating a fully defined user with role and credentials.
+     * Typically used when loading from persistent storage or assigning roles.
+     *
+     * @param id           User ID.
+     * @param firstName    First name.
+     * @param surname      Last name.
+     * @param username     Login name.
+     * @param passwordHash Hashed password string.
+     * @param role         Role of the user (e.g., "admin", "nurse").
+     */
 
     public User(long id, String firstName, String surname, String username, String passwordHash, String role) {
         super(firstName, surname);
@@ -128,25 +150,4 @@ public class User extends Person {
         this.role = role;
     }
 
-
-    /*
-    public SimpleStringProperty usernameProperty() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username.set(username);
-    }
-
-    public SimpleStringProperty getPasswordHash() { return passwordHash; }
-
-    public SimpleStringProperty passwordProperty() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(SimpleStringProperty passwordHash) { this.passwordHash = passwordHash; }
-
-    public boolean checkPassword(String plainPassword) {
-        return PasswordUtil.hashPassword(plainPassword).equals(getPassword());
-    }*/
 }
