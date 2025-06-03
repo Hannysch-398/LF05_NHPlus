@@ -62,10 +62,10 @@ Da in der Entwicklungsabteilung der HiTech GmbH agile Vorgehensweisen vorgeschri
 - auto Logout nach bestimmter Zeit , abbruch bei Mausbewegung
 - Logout-button
 - automatisches Enddatum auf jetzt setzen bei Behandlungsanlegen
-- Bei den Behandlungen steht bei welche Pflegekraft diese gemacht hat
+- Bei den Behandlungen steht dabei, welche Pflegekraft diese gemacht hat
 - automatische Konvertierung des Datums in das entsprechende Format, nicht einfach nur gesperrt
 
 
 ### Logindaten 
-admin: 
-reguläre Pflegekraft:
+admin: u.mann - G7r#vB!92pLz@Xm3
+reguläre Pflegekraft: a.suarez - qW8^zT$5nMv!Ka#1
