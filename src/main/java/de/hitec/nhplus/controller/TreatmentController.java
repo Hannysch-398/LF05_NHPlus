@@ -21,6 +21,13 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+/**
+ * Controller class for editing an existing treatment record.
+ * <p>
+ * Loads patient and treatment data, allows modification of editable fields
+ * (such as date, time, description, and assigned nurse), and persists updates
+ * to the database.
+ */
 public class TreatmentController {
 
     @FXML
@@ -53,6 +60,14 @@ public class TreatmentController {
     private List<Nurse> nurseList;
     private final ObservableList<Nurse> nurseSelection = FXCollections.observableArrayList();
 
+    /**
+     * Initializes the controller with the given window, treatment, and parent controller.
+     * Loads patient data and displays all relevant information in the form.
+     *
+     * @param controller the calling controller for refreshing the treatment table
+     * @param stage      the current window (closed after editing is complete)
+     * @param treatment  the treatment to be edited
+     */
     public void initializeController(AllTreatmentController controller, Stage stage, Treatment treatment) {
         this.stage = stage;
         this.controller = controller;
@@ -66,6 +81,10 @@ public class TreatmentController {
         }
     }
 
+    /**
+     * Displays patient information and treatment details in the form.
+     * Populates all input fields and sets the current nurse selection.
+     */
     private void showData() {
         this.labelPatientName.setText(patient.getSurname() + ", " + patient.getFirstName());
         this.labelCareLevel.setText(patient.getCareLevel());
@@ -75,14 +94,14 @@ public class TreatmentController {
         this.textFieldEnd.setText(this.treatment.getEnd());
         this.textFieldDescription.setText(this.treatment.getDescription());
         this.textAreaRemarks.setText(this.treatment.getRemarks());
-        
-        // Erst Daten laden
+
+
         this.createComboBoxDataNurse();
-        
-        // Dann ComboBox konfigurieren
+
+
         this.comboBoxNurseSelection.setItems(nurseSelection);
-        
-        // Aktuelle Pflegekraft auswählen
+
+
         for (Nurse nurse : nurseList) {
             if (nurse.getNid() == treatment.getNid()) {
                 comboBoxNurseSelection.getSelectionModel().select(nurse);
@@ -91,14 +110,17 @@ public class TreatmentController {
         }
     }
 
+    /**
+     * Loads all available nurses from the database and populates the ComboBox.
+     * Uses a {@link StringConverter} to display nurse names in "Last name, First name" format.
+     */
     private void createComboBoxDataNurse() {
         NurseDao dao = DaoFactory.getDaoFactory().createNurseDAO();
         try {
-            nurseList = dao.readAll(); // Liste der Pflegekräfte laden
-            nurseSelection.setAll(nurseList); // in ObservableList einfügen
-            comboBoxNurseSelection.setItems(nurseSelection); // ComboBox befüllen
+            nurseList = dao.readAll();
+            nurseSelection.setAll(nurseList);
+            comboBoxNurseSelection.setItems(nurseSelection);
 
-            // StringConverter für Anzeige in der ComboBox setzen
             comboBoxNurseSelection.setConverter(new StringConverter<>() {
                 @Override
                 public String toString(Nurse nurse) {
@@ -107,31 +129,38 @@ public class TreatmentController {
 
                 @Override
                 public Nurse fromString(String string) {
-                    return null; // wird nicht benötigt
+                    return null;
                 }
             });
 
         } catch (SQLException exception) {
-            exception.printStackTrace(); // besser: Logging verwenden
+            exception.printStackTrace();
         }
     }
 
+    /**
+     * Validates the form inputs to ensure all required fields are filled,
+     * time values are valid, and the end time is after the start time.
+     *
+     * @return true if inputs are valid; false otherwise
+     */
     private boolean areInputsValid() {
         try {
             LocalTime begin = DateConverter.convertStringToLocalTime(textFieldBegin.getText());
             LocalTime end = DateConverter.convertStringToLocalTime(textFieldEnd.getText());
 
-            return datePicker.getValue() != null
-                    && !textFieldDescription.getText().isBlank()
-                    && !textAreaRemarks.getText().isBlank()
-                    && begin != null
-                    && end != null
-                    && end.isAfter(begin);
+            return datePicker.getValue() != null && !textFieldDescription.getText().isBlank() &&
+                    !textAreaRemarks.getText().isBlank() && begin != null && end != null && end.isAfter(begin);
         } catch (Exception e) {
             return false;
         }
     }
 
+    /**
+     * Called when the user clicks the "Apply Changes" button.
+     * Validates inputs, updates the treatment object, saves changes to the database,
+     * and refreshes the parent controller's table view.
+     */
     @FXML
     public void handleChange() {
         if (!areInputsValid()) {
@@ -157,6 +186,9 @@ public class TreatmentController {
         stage.close();
     }
 
+    /**
+     * Performs the update of the treatment entry in the database using {@link TreatmentDao}.
+     */
     private void doUpdate() {
         TreatmentDao dao = DaoFactory.getDaoFactory().createTreatmentDao();
         try {
@@ -166,6 +198,9 @@ public class TreatmentController {
         }
     }
 
+    /**
+     * Closes the current editing window without saving changes.
+     */
     @FXML
     public void handleCancel() {
         stage.close();

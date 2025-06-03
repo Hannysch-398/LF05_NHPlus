@@ -77,12 +77,14 @@ public class AllCaregiverController {
         this.columnSurname.setCellValueFactory(new PropertyValueFactory<>("surname"));
         this.columnSurname.setCellFactory(TextFieldTableCell.forTableColumn());
 
+
         this.columnSurname.setOnEditCommit(this::handleEditSurname);
 
 
         this.columnPhoneNumber.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
         this.columnPhoneNumber.setCellFactory(TextFieldTableCell.forTableColumn());
         this.columnPhoneNumber.setOnEditCommit(this::handleEditphoneNumber);
+
 
         this.tableView.setItems(this.nurses);
 
@@ -109,16 +111,28 @@ public class AllCaregiverController {
 
 
     }
+
+    /**
+     * Sets a {@link TextFormatter} on the given {@link TextField} to restrict input to numeric characters (digits
+     * only).
+     * This is useful for fields like phone numbers or IDs where only digits should be allowed.
+     *
+     * @param field the {@link TextField} that should accept only numeric input
+     */
     private void setNumericInput(TextField field) {
         field.setTextFormatter(new TextFormatter<>(change -> {
             String newText = change.getControlNewText();
-            if (newText.matches("\\d*")) { // beliebig viele Ziffern erlaubt
+            if (newText.matches("\\d*")) {
                 return change;
             }
             return null;
         }));
     }
 
+    /**
+     * Displays a warning alert to inform the user that the attempted action is not authorized.
+     * This is typically shown when a non-admin user tries to perform restricted operations.
+     */
     private void showNotAuthorizedAlert() {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Keine Berechtigung");
@@ -127,18 +141,36 @@ public class AllCaregiverController {
         alert.showAndWait();
     }
 
-
     /**
-     * When a cell of the column with first names was changed, this method will be called, to persist the change.
+     * Handles edit events for the surname column.
+     * If the user is not an admin, the change is reverted and a warning is shown.
+     * Otherwise, the new value is persisted and the "changedBy" field is updated.
      *
-     * @param event Event including the changed object and the change.
+     * @param event the edit event containing the changed nurse
      */
-    @FXML
-    public void handleOnEditFirstname(TableColumn.CellEditEvent<Nurse, String> event) {
 
-        event.getRowValue().setFirstName(event.getNewValue());
-        this.doUpdate(event);
+    private void handleEditSurname(TableColumn.CellEditEvent<Nurse, String> event) {
+        if (!Session.isAdmin()) {
+            tableView.refresh();
+            showNotAuthorizedAlert();
+            return;
+        }
+
+        Nurse nurse = event.getRowValue();
+        nurse.setSurname(event.getNewValue());
+
+
+        nurse.setChangedBy(Session.getCurrentUsername());
+
+        try {
+            dao.update(nurse);
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        }
+
     }
+
 
     /**
      * When a cell of the column with surnames was changed, this method will be called, to persist the change.
@@ -217,17 +249,6 @@ public class AllCaregiverController {
         this.doUpdate(event);
     }
 
-    /**
-     * When a cell of the column with Nurse ID was changed, this method will be called, to persist the change.
-     *
-     * @param event Event including the changed object and the change.
-     */
-
-    //   @FXML
-    //   public void handleOnEditCareLevel(TableColumn.CellEditEvent<Nurse, String> event) {
-    //       event.getRowValue().setNid(event.getNewValue());
-    //       this.doUpdate(event);
-    //  }
 
     /**
      * Updates a nurse by calling the method <code>update()</code> of {@link NurseDao}.
@@ -257,37 +278,13 @@ public class AllCaregiverController {
 
 
     /**
-     * This method handles events fired by the button to delete nurses. It calls {@link NurseDao} to delete the
-     * nurse from the database and removes the object from the list, which is the data source of the
-     * <code>TableView</code>.
+     * Handles the deletion of a caregiver entry by marking it for deletion.
+     * Requires admin rights and asks for user confirmation.
      */
-   /* @FXML
-    public void handleDelete() {
-        Nurse selectedItem = this.tableView.getSelectionModel().getSelectedItem();
-        // Sicherheitsabfrage
-        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmAlert.setTitle("Löschen bestätigen");
-        confirmAlert.setHeaderText("Sind Sie sicher?");
-        confirmAlert.setContentText("Möchten Sie diesen Pfleger wirklich löschen?");
-
-        Optional<ButtonType> result = confirmAlert.showAndWait();
-        if (result.isEmpty() || result.get() != ButtonType.OK) {
-            // Abgebrochen
-            return;
-        }
-        if (selectedItem != null) {
-            try {
-                DaoFactory.getDaoFactory().createNurseDAO().deleteById(selectedItem.getNid());
-                this.tableView.getItems().remove(selectedItem);
-            } catch (SQLException exception) {
-                exception.printStackTrace();
-            }
-        }
-    }*/
     @FXML
     public void handleMarkForDelete() {
         Nurse selectedItem = this.tableView.getSelectionModel().getSelectedItem();
-        // Sicherheitsabfrage
+
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle("Löschen bestätigen");
         confirmAlert.setHeaderText("Sind Sie sicher?");
@@ -295,25 +292,25 @@ public class AllCaregiverController {
 
         Optional<ButtonType> result = confirmAlert.showAndWait();
         if (result.isEmpty() || result.get() != ButtonType.OK) {
-            // Abgebrochen
+
             return;
         }
         if (selectedItem != null) {
-            selectedItem.markForDeletion(); // setzt z. B. status = "i", deletionDate = +10 Jahre
-            /*String currentUser = Session.getCurrentUser().getUsername();
+          selectedItem.markForDeletion();
+            String currentUser = Session.getCurrentUser().getUsername();
             Nurse nurse = tableView.getSelectionModel().getSelectedItem();
             nurse.setDeletedBy(currentUser);
-            System.out.println(nurse.getDeletedBy());*/
-            setDeletedBy();
-            this.tableView.refresh();
+
 
             try {
-                DaoFactory.getDaoFactory().createNurseDAO().update(selectedItem); // speichert Soft-Delete
+                DaoFactory.getDaoFactory().createNurseDAO().update(selectedItem);
             } catch (SQLException exception) {
                 exception.printStackTrace();
             }
 
-             // zeigt neue Daten sofort
+
+            this.tableView.refresh();
+
         }
     }
 
@@ -328,17 +325,10 @@ public class AllCaregiverController {
         String surname = this.textFieldSurname.getText();
         String firstName = this.textFieldFirstName.getText();
         String phoneNumber = this.textFieldPhoneNumber.getText();
-        System.out.println("handleAdd aufgerufen");
         try {
-
             this.dao.create(new Nurse(firstName, surname, phoneNumber, Nurse.STATUS_ACTIVE, null, null, null, null));
-            System.out.println("Pflegekraft wird erstellt: " + firstName + " " + surname + " " + phoneNumber);
-
         } catch (SQLException exception) {
             exception.printStackTrace();
-
-            System.err.println("Fehler beim Erstellen der Pflegekraft.");
-
         }
 
         readAllAndShowInTableView();
@@ -353,43 +343,42 @@ public class AllCaregiverController {
         this.textFieldFirstName.clear();
         this.textFieldSurname.clear();
         this.textFieldPhoneNumber.clear();
-
-
     }
 
+    /**
+     * Validates that all required input fields are filled with non-blank values.
+     *
+     * @return true if input is valid, false otherwise
+     */
     private boolean areInputDataValid() {
-
-
         return !this.textFieldFirstName.getText().isBlank() && !this.textFieldSurname.getText().isBlank() &&
                 !this.textFieldPhoneNumber.getText().isBlank();
     }
 
 
+    /**
+     * Handles editing of the selected caregiver using the input fields.
+     * Applies changes to the selected nurse and updates the database.
+     * Also sets the {@code changedBy} field to the current user.
+     */
 
     @FXML
     public void handleEdit() {
 
         Nurse selected = this.tableView.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            return; // kein Element ausgewählt
+            return;
         }
 
-        // Daten aus Textfeldern holen
         String newFirstName = this.textFieldFirstName.getText();
         String newSurname = this.textFieldSurname.getText();
         String newPhoneNumber = this.textFieldPhoneNumber.getText();
 
-        // Validierung
-        /*if (newFirstName.isBlank() || newSurname.isBlank() || newPhoneNumber.isBlank()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Bitte alle Felder ausfüllen.");
-            alert.show();
-            return;
-        }*/
         String currentUser = Session.getCurrentUser().getUsername();
         Nurse nurse = tableView.getSelectionModel().getSelectedItem();
         nurse.setChangedBy(currentUser);
-        System.out.println(nurse.getChangedBy());
-        // Objekt aktualisieren
+
+
         if (!newFirstName.isEmpty()) {
             selected.setFirstName(newFirstName);
         }
@@ -401,9 +390,9 @@ public class AllCaregiverController {
         }
 
         try {
-            this.dao.update(selected); // Änderungen in der DB speichern
-            this.tableView.refresh(); // Ansicht aktualisieren
-            clearTextfields();        // Eingabefelder leeren
+            this.dao.update(selected);
+            this.tableView.refresh();
+            clearTextfields();
         } catch (SQLException e) {
             e.printStackTrace();
         }
