@@ -2,15 +2,13 @@ package de.hitec.nhplus.controller;
 
 import de.hitec.nhplus.datastorage.DaoFactory;
 import de.hitec.nhplus.datastorage.NurseDao;
-import de.hitec.nhplus.datastorage.PatientDao;
 import de.hitec.nhplus.model.Nurse;
 
+import de.hitec.nhplus.model.Patient;
 import de.hitec.nhplus.utils.Session;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -18,7 +16,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 
 
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,64 +66,23 @@ public class AllCaregiverController {
         this.dao = DaoFactory.getDaoFactory().createNurseDAO();
         this.readAllAndShowInTableView();
 
+
         this.columnNid.setCellValueFactory(new PropertyValueFactory<>("nid"));
 
         this.columnFirstName.setCellValueFactory(new PropertyValueFactory<>("firstName"));
         this.columnFirstName.setCellFactory(TextFieldTableCell.forTableColumn());
-        this.columnFirstName.setOnEditCommit(event -> {
-            if (!Session.isAdmin()) {
-                // Änderung zurücksetzen (optional)
-                tableView.refresh();  // Zeigt den alten Wert wieder
-                showNotAuthorizedAlert();
-                return;
-            }
-
-            Nurse nurse = event.getRowValue();
-            nurse.setFirstName(event.getNewValue());
-            try {
-                dao.update(nurse);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+        this.columnFirstName.setOnEditCommit(this::handleEditFirstname);
 
 
         this.columnSurname.setCellValueFactory(new PropertyValueFactory<>("surname"));
         this.columnSurname.setCellFactory(TextFieldTableCell.forTableColumn());
-        this.columnSurname.setOnEditCommit(event -> {
-            if (!Session.isAdmin()) {
-                // Änderung zurücksetzen (optional)
-                tableView.refresh();  // Zeigt den alten Wert wieder
-                showNotAuthorizedAlert();
-                return;
-            }
-            Nurse nurse = event.getRowValue();
-            nurse.setSurname(event.getNewValue());
-            try {
 
-                dao.update(nurse);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+        this.columnSurname.setOnEditCommit(this::handleEditSurname);
+
 
         this.columnPhoneNumber.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
         this.columnPhoneNumber.setCellFactory(TextFieldTableCell.forTableColumn());
-        this.columnPhoneNumber.setOnEditCommit(event -> {
-            if (!Session.isAdmin()) {
-                // Änderung zurücksetzen (optional)
-                tableView.refresh();  // Zeigt den alten Wert wieder
-                showNotAuthorizedAlert();
-                return;
-            }
-            Nurse nurse = event.getRowValue();
-            nurse.setPhoneNumber(event.getNewValue());
-            try {
-                dao.update(nurse);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+        this.columnPhoneNumber.setOnEditCommit(this::handleEditphoneNumber);
 
         this.tableView.setItems(this.nurses);
 
@@ -179,6 +135,7 @@ public class AllCaregiverController {
      */
     @FXML
     public void handleOnEditFirstname(TableColumn.CellEditEvent<Nurse, String> event) {
+
         event.getRowValue().setFirstName(event.getNewValue());
         this.doUpdate(event);
     }
@@ -189,9 +146,64 @@ public class AllCaregiverController {
      * @param event Event including the changed object and the change.
      */
     @FXML
-    public void handleOnEditSurname(TableColumn.CellEditEvent<Nurse, String> event) {
-        event.getRowValue().setSurname(event.getNewValue());
-        this.doUpdate(event);
+    private void handleEditSurname(TableColumn.CellEditEvent<Nurse, String> event) {
+        if (!Session.isAdmin()) {
+            tableView.refresh();  // reset change visually
+            showNotAuthorizedAlert();
+            return;
+        }
+
+        Nurse nurse = event.getRowValue();
+        nurse.setSurname(event.getNewValue());
+
+        // Set changedBy to current user
+        setChangedBy();
+
+        try {
+            dao.update(nurse);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    @FXML
+    private void handleEditFirstname(TableColumn.CellEditEvent<Nurse, String> event) {
+        if (!Session.isAdmin()) {
+            tableView.refresh();
+            showNotAuthorizedAlert();
+            return;
+        }
+
+        Nurse nurse = event.getRowValue();
+        nurse.setFirstName(event.getNewValue());
+
+        // Set changedBy to current user
+        setChangedBy();
+
+        try {
+            dao.update(nurse);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    @FXML
+    private void handleEditphoneNumber(TableColumn.CellEditEvent<Nurse, String> event) {
+        if (!Session.isAdmin()) {
+            tableView.refresh();
+            showNotAuthorizedAlert();
+            return;
+        }
+
+        Nurse nurse = event.getRowValue();
+        nurse.setFirstName(event.getNewValue());
+
+        // Set changedBy to current user
+        setChangedBy();
+
+        try {
+            dao.update(nurse);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -288,10 +300,12 @@ public class AllCaregiverController {
         }
         if (selectedItem != null) {
             selectedItem.markForDeletion(); // setzt z. B. status = "i", deletionDate = +10 Jahre
-            String currentUser = Session.getCurrentUser().getUsername();
+            /*String currentUser = Session.getCurrentUser().getUsername();
             Nurse nurse = tableView.getSelectionModel().getSelectedItem();
             nurse.setDeletedBy(currentUser);
-            System.out.println(nurse.getDeletedBy());
+            System.out.println(nurse.getDeletedBy());*/
+            setDeletedBy();
+            this.tableView.refresh();
 
             try {
                 DaoFactory.getDaoFactory().createNurseDAO().update(selectedItem); // speichert Soft-Delete
@@ -299,7 +313,7 @@ public class AllCaregiverController {
                 exception.printStackTrace();
             }
 
-            this.tableView.refresh(); // zeigt neue Daten sofort
+             // zeigt neue Daten sofort
         }
     }
 
@@ -351,6 +365,7 @@ public class AllCaregiverController {
     }
 
 
+
     @FXML
     public void handleEdit() {
 
@@ -392,5 +407,13 @@ public class AllCaregiverController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+    private void setChangedBy(){
+        Nurse nurse = tableView.getSelectionModel().getSelectedItem();
+        nurse.setChangedBy(Session.getCurrentUser().getUsername());
+    }
+    private void setDeletedBy(){
+        Nurse nurse = tableView.getSelectionModel().getSelectedItem();
+        nurse.setDeletedBy(Session.getCurrentUser().getUsername());
     }
 }

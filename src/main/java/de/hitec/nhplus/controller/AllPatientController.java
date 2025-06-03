@@ -204,11 +204,15 @@ public class AllPatientController {
      */
     @FXML
     public void handleOnEditFirstname(TableColumn.CellEditEvent<Patient, String> event) {
-        if (Session.isAdmin()) {
-            event.getRowValue().setFirstName(event.getNewValue());
-            setChangedBy();
-            this.doUpdate(event);
-        }
+
+        if (Session.isAdmin()){
+        event.getRowValue().setFirstName(event.getNewValue());
+        setChangedBy();
+        this.doUpdate(event);}
+        else{
+            tableView.refresh();  // Zeigt den alten Wert wieder
+            showNotAuthorizedAlert();}
+
     }
 
     /**
@@ -223,6 +227,11 @@ public class AllPatientController {
             setChangedBy();
             this.doUpdate(event);
         }
+
+        else{
+        tableView.refresh();  // Zeigt den alten Wert wieder
+            showNotAuthorizedAlert();}
+
     }
 
     /**
@@ -232,11 +241,16 @@ public class AllPatientController {
      */
     @FXML
     public void handleOnEditDateOfBirth(TableColumn.CellEditEvent<Patient, String> event) {
-        if (Session.isAdmin()) {
-            event.getRowValue().setDateOfBirth(event.getNewValue());
-            setChangedBy();
-            this.doUpdate(event);
-        }
+
+        if (Session.isAdmin()){
+        event.getRowValue().setDateOfBirth(event.getNewValue());
+        setChangedBy();
+
+        this.doUpdate(event);}
+        else{
+            tableView.refresh();  // Zeigt den alten Wert wieder
+            showNotAuthorizedAlert();}
+
     }
 
     /**
@@ -246,11 +260,16 @@ public class AllPatientController {
      */
     @FXML
     public void handleOnEditCareLevel(TableColumn.CellEditEvent<Patient, String> event) {
-        if (Session.isAdmin()) {
-            event.getRowValue().setCareLevel(event.getNewValue());
-            setChangedBy();
-            this.doUpdate(event);
-        }
+
+        if (Session.isAdmin()){
+        event.getRowValue().setCareLevel(event.getNewValue());
+        setChangedBy();
+
+        this.doUpdate(event);}
+        else{
+            tableView.refresh();  // Zeigt den alten Wert wieder
+            showNotAuthorizedAlert();}
+
     }
 
     /**
@@ -260,11 +279,15 @@ public class AllPatientController {
      */
     @FXML
     public void handleOnEditRoomNumber(TableColumn.CellEditEvent<Patient, String> event) {
-        if (Session.isAdmin()) {
-            event.getRowValue().setRoomNumber(event.getNewValue());
-            setChangedBy();
-            this.doUpdate(event);
-        }
+
+        if (Session.isAdmin()){
+        event.getRowValue().setRoomNumber(event.getNewValue());
+        setChangedBy();
+        this.doUpdate(event);}
+        else{
+            tableView.refresh();  // Zeigt den alten Wert wieder
+            showNotAuthorizedAlert();}
+
     }
 
     /**
@@ -319,7 +342,7 @@ public class AllPatientController {
         confirmAlert.setTitle("Löschen bestätigen");
         confirmAlert.setHeaderText("Sind Sie sicher?");
         confirmAlert.setContentText("Möchten Sie diese/n Patient/in wirklich löschen?");
-
+        setDeletedBy();
         Optional<ButtonType> result = confirmAlert.showAndWait();
         if (result.isEmpty() || result.get() != ButtonType.OK) {
             // Abgebrochen
@@ -387,8 +410,20 @@ public class AllPatientController {
                 !this.textFieldRoomNumber.getText().isBlank();
     }
 
-    private void setChangedBy() {
+    private void showNotAuthorizedAlert() {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Keine Berechtigung");
+        alert.setHeaderText("Aktion nicht erlaubt");
+        alert.setContentText("Nur Administratoren dürfen Pflegekräfte bearbeiten.");
+        alert.showAndWait();
+    }
+    private void setChangedBy(){
+
         Patient patient = tableView.getSelectionModel().getSelectedItem();
         patient.setChangedBy(Session.getCurrentUser().getUsername());
+    }
+    private void setDeletedBy(){
+        Patient patient = tableView.getSelectionModel().getSelectedItem();
+        patient.setDeletedBy(Session.getCurrentUser().getUsername());
     }
 }
