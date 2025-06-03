@@ -211,8 +211,8 @@ public class SetUpDB {
     private static void setUpUsers() {
         try {
             UserDao dao = DaoFactory.getDaoFactory().createUserDAO();
-            dao.create(new User( 1, "Udo", "Mann", "u.mann", "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9", "admin"));
-            dao.create(new User( 2, "Anna","Suarez", "a.suarez", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a", ""));
+            dao.create(new User( 1, "Udo", "Mann", "u.mann", "63aeaae0d2d1431ffdb360cafadaed6b9b5cf6046d214d6edd90c1ed074ff6f1", "admin"));
+            dao.create(new User( 2, "Anna","Suarez", "a.suarez", "4a38ceb86c5763336babff235a63cf482cbbb9c59b151d39a355cb21ef12be70", ""));
             dao.create(new User( 3, "Lin","Park", "l.park", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a", ""));
             dao.create(new User( 4, "James","Ross", "j.ross", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a", ""));
             dao.create(new User( 5, "Michael","Berg", "m.berg", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a", ""));
