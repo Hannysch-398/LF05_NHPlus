@@ -5,10 +5,6 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * Utility class for hashing passwords using SHA-256.
- * <p>
- * Note: For production use, it's recommended to use a stronger password hashing function
- * like bcrypt, scrypt, or Argon2 which are specifically designed for password security.
- * SHA-256 is fast and therefore more vulnerable to brute-force attacks.
  */
 
 public class PasswordUtil {
