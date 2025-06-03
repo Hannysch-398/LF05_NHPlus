@@ -331,7 +331,7 @@ public class TreatmentDao extends DaoImp<Treatment> {
             stmt.setString(2, Treatment.STATUS_ACTIVE);
 
             int deleted = stmt.executeUpdate();
-            System.out.println("Number of deleted inactive treatments with expired deletion date: " + deleted);
+
         }
     }
 

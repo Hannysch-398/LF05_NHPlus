@@ -131,7 +131,7 @@ public class AllTreatmentController {
             }
 
             this.treatments.addAll(allTreatments);
-            System.out.println("Behandlungen geladen: " + this.treatments.size());
+
         } catch (SQLException exception) {
             exception.printStackTrace();
         }

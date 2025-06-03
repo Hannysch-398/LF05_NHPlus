@@ -170,7 +170,11 @@ public class AllCaregiverController {
         }
 
     }
-
+    /**
+     * When a cell of the column with FirstName was changed, this method will be called, to persist the change.
+     *
+     * @param event Event including the changed object and the change.
+     */
 
     @FXML
     private void handleEditFirstname(TableColumn.CellEditEvent<Nurse, String> event) {
@@ -192,7 +196,11 @@ public class AllCaregiverController {
             e.printStackTrace();
         }
     }
-
+    /**
+     * When a cell of the column with phoneN was changed, this method will be called, to persist the change.
+     *
+     * @param event Event including the changed object and the change.
+     */
     @FXML
     private void handleEditphoneNumber(TableColumn.CellEditEvent<Nurse, String> event) {
         if (!Session.isAdmin()) {
@@ -212,17 +220,6 @@ public class AllCaregiverController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * When a cell of the column with phoneNumber was changed, this method will be called, to persist the change.
-     *
-     * @param event Event including the changed object and the change.
-     */
-    @FXML
-    public void handleOnEditPhoneNumber(TableColumn.CellEditEvent<Nurse, String> event) {
-        event.getRowValue().setPhoneNumber(event.getNewValue());
-        this.doUpdate(event);
     }
 
 
@@ -331,47 +328,6 @@ public class AllCaregiverController {
     }
 
 
-    /**
-     * Handles editing of the selected caregiver using the input fields.
-     * Applies changes to the selected nurse and updates the database.
-     * Also sets the {@code changedBy} field to the current user.
-     */
-
-    @FXML
-    public void handleEdit() {
-
-        Nurse selected = this.tableView.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            return;
-        }
-
-        String newFirstName = this.textFieldFirstName.getText();
-        String newSurname = this.textFieldSurname.getText();
-        String newPhoneNumber = this.textFieldPhoneNumber.getText();
-
-        String currentUser = Session.getCurrentUser().getUsername();
-        Nurse nurse = tableView.getSelectionModel().getSelectedItem();
-        nurse.setChangedBy(currentUser);
-
-
-        if (!newFirstName.isEmpty()) {
-            selected.setFirstName(newFirstName);
-        }
-        if (!newSurname.isEmpty()) {
-            selected.setSurname(newSurname);
-        }
-        if (!newPhoneNumber.isEmpty()) {
-            selected.setPhoneNumber(newPhoneNumber);
-        }
-
-        try {
-            this.dao.update(selected);
-            this.tableView.refresh();
-            clearTextfields();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     private void setChangedBy() {
         Nurse nurse = tableView.getSelectionModel().getSelectedItem();
