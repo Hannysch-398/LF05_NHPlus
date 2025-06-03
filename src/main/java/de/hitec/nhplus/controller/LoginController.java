@@ -48,9 +48,6 @@ public class LoginController {
             messageLabel.setText("Bitte Benutzername und Passwort eingeben.");
             return;
         }
-        //Test
-        System.out.println("Eingegebenes Passwort (klar): " + inputPassword);
-        System.out.println("Gehasht (zur Kontrolle): " + PasswordUtil.hashPassword(inputPassword));
 
 
         try {
@@ -62,9 +59,7 @@ public class LoginController {
 
                 if (user.getUsername().equals(inputUsername) && user.checkPassword(inputPassword)) {
                     Session.setCurrentUser(user);
-                    System.out.println(Session.isAdmin());
                     messageLabel.setText("Login erfolgreich!");
-
 
                     mainWindow();
                     return;
