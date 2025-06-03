@@ -157,7 +157,7 @@ public class SetUpDB {
         try {
             NurseDao dao = DaoFactory.getDaoFactory().createNurseDAO();
             dao.create(new Nurse("Maria", "Schmidt", "020393", Nurse.STATUS_ACTIVE, null, null, null, null));
-            dao.create(new Nurse("Michael", "Berg", "0203931", Nurse.STATUS_ACTIVE, null, null, null, ""));
+            dao.create(new Nurse("Michael", "Berg", "0203931", Nurse.STATUS_ACTIVE, null, null, null, null));
             dao.create(new Nurse("Lin", "Park", "0203932", Nurse.STATUS_ACTIVE, null, null, null, null));
             dao.create(new Nurse("James", "Ross", "0203933", Nurse.STATUS_ACTIVE, null, null, null, null));
             dao.create(new Nurse("Anna", "Suarez", "0203933", Nurse.STATUS_ACTIVE, null, null, null, null));
@@ -212,10 +212,10 @@ public class SetUpDB {
         try {
             UserDao dao = DaoFactory.getDaoFactory().createUserDAO();
             dao.create(new User( 1, "Udo", "Mann", "u.mann", "63aeaae0d2d1431ffdb360cafadaed6b9b5cf6046d214d6edd90c1ed074ff6f1", "admin"));
-            dao.create(new User( 2, "Anna","Suarez", "a.suarez", "4a38ceb86c5763336babff235a63cf482cbbb9c59b151d39a355cb21ef12be70", ""));
-            dao.create(new User( 3, "Lin","Park", "l.park", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a", ""));
-            dao.create(new User( 4, "James","Ross", "j.ross", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a", ""));
-            dao.create(new User( 5, "Michael","Berg", "m.berg", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a", ""));
+            dao.create(new User( 2, "Anna","Suarez", "a.suarez", "4a38ceb86c5763336babff235a63cf482cbbb9c59b151d39a355cb21ef12be70", "nurse"));
+            dao.create(new User( 3, "Lin","Park", "l.park", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a", "nurse"));
+            dao.create(new User( 4, "James","Ross", "j.ross", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a", "nurse"));
+            dao.create(new User( 5, "Michael","Berg", "m.berg", "9ca0fa116392c9e5338856285a4d79b59ca6657ec2104553db81496b0a3bca0a", "nurse"));
         } catch (SQLException exception) {
             exception.printStackTrace();
         }

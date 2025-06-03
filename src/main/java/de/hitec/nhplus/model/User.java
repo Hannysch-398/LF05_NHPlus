@@ -49,46 +49,29 @@ public class User extends Person {
     }
 
     /**
-     * Returns the ID of the user.
-     *
-     * @return ID of the user.
+     * Getter and Setter Methods
      */
+
     public long getId() {
         return id;
     }
 
-    /**
-     * Sets the ID of the user.
-     *
-     * @param id ID to assign to the user.
-     */
+
     public void setId(long id) {
         this.id = id;
     }
 
-    /**
-     * Returns the username of the user.
-     *
-     * @return Username as a <code>String</code>.
-     */
+
     public String getUsername() {
         return username.get();
     }
 
-    /**
-     * Returns the JavaFX property for the username. Useful for bindings.
-     *
-     * @return <code>SimpleStringProperty</code> representing the username.
-     */
+
     public SimpleStringProperty usernameProperty() {
         return username;
     }
 
-    /**
-     * Sets the username of the user.
-     *
-     * @param username Username to assign.
-     */
+
     public void setUsername(String username) {
         this.username.set(username);
     }
@@ -103,22 +86,23 @@ public class User extends Person {
     }
 
 
-    /**
-     * Returns the JavaFX property for the password. Useful for bindings.
-     *
-     * @return <code>SimpleStringProperty</code> representing the password hash.
-     */
     public SimpleStringProperty passwordProperty() {
         return password;
     }
 
-    /**
-     * Sets the password for the user. The password will be hashed using <code>PasswordUtil</code>.
-     *
-     * @param plainPassword The plain text password to hash and store.
-     */
+
     public void setPassword(String plainPassword) {
         this.password.set(PasswordUtil.hashPassword(plainPassword));
+    }
+
+
+    public String getRole() {
+        return role;
+    }
+
+
+    public void setAdmin(String role) {
+        this.role = role;
     }
 
     /**
@@ -131,23 +115,8 @@ public class User extends Person {
         return PasswordUtil.hashPassword(plainPassword).equals(getPassword());
     }
 
-    /**
-     * Returns the role of the user (e.g., admin, nurse, etc.).
-     *
-     * @return Role as a <code>String</code>.
-     */
 
-    public String getRole() {
-        return role;
-    }
 
-    /**
-     * Sets the role of the user.
-     *
-     * @param role Role to assign.
-     */
-    public void setAdmin(String role) {
-        this.role = role;
-    }
+
 
 }

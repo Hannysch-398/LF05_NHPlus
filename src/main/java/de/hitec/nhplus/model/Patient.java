@@ -18,7 +18,6 @@ public class Patient extends Person {
     private final SimpleStringProperty dateOfBirth;
     private final SimpleStringProperty careLevel;
     private final SimpleStringProperty roomNumber;
-    //   private final SimpleStringProperty assets;
     private final List<Treatment> allTreatments = new ArrayList<>();
     private SimpleStringProperty status;
     public static final String STATUS_ACTIVE = "a";

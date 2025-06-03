@@ -142,6 +142,7 @@ public class Nurse extends Person {
         return deletedBy;
     }
 
+
     public String toString() {
         return "Pfleger/in" + "\nNID: " + this.nid + "\nFirstname: " + this.getFirstName() + "\nSurname: " +
                 this.getSurname() + "\nPhoneNumber: " + this.phoneNumber + "\nStatus: " + this.status +
