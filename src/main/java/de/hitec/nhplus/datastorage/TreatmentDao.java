@@ -293,15 +293,23 @@ public class TreatmentDao extends DaoImp<Treatment> {
         }
         return preparedStatement;
     }
-
+    /**
+     * Generates a {@link PreparedStatement} to set the deletion and archive date
+     * of a treatment identified by its ID.
+     * The deletion date is set 10 years into the future,
+     * while the archive date is set to the current date.
+     *
+     * @param tid ID of the treatment to update
+     * @return the prepared statement to update the treatment dates
+     */
     @Override
     protected PreparedStatement setDeleteDateStatement(long tid) {
         PreparedStatement preparedStatement = null;
         try {
             final String SQL = "UPDATE treatment SET deletionDate = ?, archiveDate = ? WHERE tid = ?";
             preparedStatement = this.connection.prepareStatement(SQL);
-            preparedStatement.setDate(1, java.sql.Date.valueOf(LocalDate.now().plusYears(10))); // Löschdatum
-            preparedStatement.setDate(2, java.sql.Date.valueOf(LocalDate.now()));               // Archivdatum
+            preparedStatement.setDate(1, java.sql.Date.valueOf(LocalDate.now().plusYears(10))); // deletion date
+            preparedStatement.setDate(2, java.sql.Date.valueOf(LocalDate.now()));               // archive date
             preparedStatement.setLong(3, tid);
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -309,22 +317,24 @@ public class TreatmentDao extends DaoImp<Treatment> {
         return preparedStatement;
     }
 
+    /**
+     * Deletes all treatments from the database whose deletion date has passed,
+     * are no longer active, and have a non-null deletion date.
+     * This is a hard delete operation.
+     *
+     * @throws SQLException if an error occurs during execution
+     */
     public void deleteExpiredTreatments() throws SQLException {
-        final String SQL = "DELETE FROM treatment " + "WHERE deletionDate IS NOT NULL " + "AND deletionDate <= ? " +
-                "AND status != ?";  // Nur wenn NICHT aktiv
-
+        final String SQL = "DELETE FROM treatment WHERE deletionDate IS NOT NULL AND deletionDate <= ? AND status != ?";
         try (PreparedStatement stmt = this.connection.prepareStatement(SQL)) {
             stmt.setDate(1, java.sql.Date.valueOf(LocalDate.now()));
             stmt.setString(2, Treatment.STATUS_ACTIVE);
 
             int deleted = stmt.executeUpdate();
-            System.out.println("Anzahl gelöschter inaktiver Behandlungen mit abgelaufenem Löschdatum: " + deleted);
+            System.out.println("Number of deleted inactive treatments with expired deletion date: " + deleted);
         }
     }
 
-
-
-    //Alle Behandlungen löschen/ sperren wenn der entsprechende Patient gesperrt wurde
 
 
 

@@ -24,6 +24,14 @@ import java.awt.*;
 import java.io.IOException;
 import java.sql.SQLException;
 
+/**
+ * Controller class for the main application window.
+ * <p>
+ * Handles navigation between patient, nurse, and treatment views,
+ * manages automatic logout on inactivity, and displays the currently logged-in user.
+ */
+
+
 public class MainWindowController {
 
 
@@ -32,11 +40,16 @@ public class MainWindowController {
 
     private Timeline inactivityTimer;
 
+    /**
+     * Called automatically after the FXML file has been loaded.
+     * Initializes the inactivity timer and registers global event filters
+     * for mouse and keyboard activity to reset the timer on interaction.
+     */
     @FXML
     public void initialize() {
         setupInactivityTimer();
 
-        // Warten, bis die Szene fertig ist
+
         Platform.runLater(() -> {
             Scene scene = mainBorderPane.getScene();
             scene.addEventFilter(MouseEvent.ANY, e -> resetTimer());
@@ -44,12 +57,19 @@ public class MainWindowController {
         });
     }
 
+    /**
+     * Initializes the inactivity timer.
+     * If no input is detected within a defined time interval, {@code autoLogout()} is triggered.
+     */
     private void setupInactivityTimer() {
         inactivityTimer = new Timeline(new KeyFrame(Duration.minutes(1), e -> autoLogout()));
         inactivityTimer.setCycleCount(1);
         inactivityTimer.play();
     }
 
+    /**
+     * Resets the inactivity timer, e.g. when user interaction is detected such as mouse movement or key press.
+     */
     private void resetTimer() {
         if (inactivityTimer != null) {
             inactivityTimer.stop();
@@ -57,6 +77,10 @@ public class MainWindowController {
         }
     }
 
+    /**
+     * Logs out the current user automatically, clears the session, and returns to the login screen.
+     * This is triggered by the inactivity timer.
+     */
     private void autoLogout() {
         Session.clear();
 
@@ -72,6 +96,11 @@ public class MainWindowController {
         }
     }
 
+    /**
+     * Displays the patient overview and deletes expired patient records from the database beforehand.
+     *
+     * @param event the ActionEvent triggered by the user interaction
+     */
     @FXML
     private void handleShowAllPatient(ActionEvent event) {
         try {
@@ -85,6 +114,11 @@ public class MainWindowController {
         }
     }
 
+    /**
+     * Displays the treatment overview and deletes expired treatment records from the database beforehand.
+     *
+     * @param event the ActionEvent triggered by the user interaction
+     */
     @FXML
     private void handleShowAllTreatments(ActionEvent event) {
         try {
@@ -100,6 +134,11 @@ public class MainWindowController {
         }
     }
 
+    /**
+     * Displays the caregiver overview and deletes expired nurse records from the database beforehand.
+     *
+     * @param event the ActionEvent triggered by the user interaction
+     */
     @FXML
     private void handleShowAllCaregiver(ActionEvent event) {
         try {
@@ -116,18 +155,11 @@ public class MainWindowController {
         }
     }
 
-    @FXML
-    private void handleShowTest(ActionEvent event) {
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/hitec/nhplus/TestView.fxml"));
-        try {
-            mainBorderPane.setCenter(loader.load());
-
-        } catch (IOException exception) {
-            exception.printStackTrace();
-        }
-    }
-
-
+    /**
+     * Logs out the current user, clears the session, and returns to the login screen.
+     *
+     * @param event the ActionEvent triggered by the user interaction
+     */
     @FXML
     private void handleLogout(ActionEvent event) {
         Session.clear();
@@ -143,13 +175,19 @@ public class MainWindowController {
             e.printStackTrace();
         }
     }
+
     @FXML
     private Label loggedInUserLabel;
 
+    /**
+     * Sets the username of the currently logged-in user in the main window.
+     * Typically called after successful login.
+     *
+     * @param username the currently logged-in username
+     */
     public void setLoggedInUser(String username) {
         loggedInUserLabel.setText(username);
     }
-
 
 
 }
