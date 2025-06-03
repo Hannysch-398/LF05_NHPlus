@@ -76,7 +76,9 @@ public class AllCaregiverController {
 
         this.columnSurname.setCellValueFactory(new PropertyValueFactory<>("surname"));
         this.columnSurname.setCellFactory(TextFieldTableCell.forTableColumn());
+
         this.columnSurname.setOnEditCommit(this::handleEditSurname);
+
 
         this.columnPhoneNumber.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
         this.columnPhoneNumber.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -94,16 +96,29 @@ public class AllCaregiverController {
         this.buttonAdd.setDisable(true);
 
         if (Session.isAdmin()) {
-            ChangeListener<String> inputNewNurseListener = (observable, oldText, newText) ->
-                    this.buttonAdd.setDisable(!this.areInputDataValid());
+
+            setNumericInput(this.textFieldPhoneNumber);
+
+            ChangeListener<String> inputNewNurseListener =
+                    (observable, oldText, newText) -> this.buttonAdd.setDisable(!this.areInputDataValid());
 
             this.textFieldSurname.textProperty().addListener(inputNewNurseListener);
             this.textFieldFirstName.textProperty().addListener(inputNewNurseListener);
             this.textFieldPhoneNumber.textProperty().addListener(inputNewNurseListener);
         }
 
-        this.buttonEdit.setDisable(!Session.isAdmin());
+
     }
+    private void setNumericInput(TextField field) {
+        field.setTextFormatter(new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+            if (newText.matches("\\d*")) { // beliebig viele Ziffern erlaubt
+                return change;
+            }
+            return null;
+        }));
+    }
+
     private void showNotAuthorizedAlert() {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Keine Berechtigung");
@@ -269,7 +284,6 @@ public class AllCaregiverController {
             }
         }
     }*/
-
     @FXML
     public void handleMarkForDelete() {
         Nurse selectedItem = this.tableView.getSelectionModel().getSelectedItem();
@@ -317,7 +331,7 @@ public class AllCaregiverController {
         System.out.println("handleAdd aufgerufen");
         try {
 
-            this.dao.create(new Nurse(firstName, surname, phoneNumber, Nurse.STATUS_ACTIVE, null,null,null,null));
+            this.dao.create(new Nurse(firstName, surname, phoneNumber, Nurse.STATUS_ACTIVE, null, null, null, null));
             System.out.println("Pflegekraft wird erstellt: " + firstName + " " + surname + " " + phoneNumber);
 
         } catch (SQLException exception) {
@@ -376,12 +390,15 @@ public class AllCaregiverController {
         nurse.setChangedBy(currentUser);
         System.out.println(nurse.getChangedBy());
         // Objekt aktualisieren
-        if (!newFirstName.isEmpty()){
-        selected.setFirstName(newFirstName);}
-        if(!newSurname.isEmpty()){
-        selected.setSurname(newSurname);}
-        if (!newPhoneNumber.isEmpty()){
-        selected.setPhoneNumber(newPhoneNumber);}
+        if (!newFirstName.isEmpty()) {
+            selected.setFirstName(newFirstName);
+        }
+        if (!newSurname.isEmpty()) {
+            selected.setSurname(newSurname);
+        }
+        if (!newPhoneNumber.isEmpty()) {
+            selected.setPhoneNumber(newPhoneNumber);
+        }
 
         try {
             this.dao.update(selected); // Änderungen in der DB speichern
