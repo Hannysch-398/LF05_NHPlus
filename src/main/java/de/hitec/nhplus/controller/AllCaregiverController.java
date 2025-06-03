@@ -172,31 +172,6 @@ public class AllCaregiverController {
     }
 
 
-    /**
-     * When a cell of the column with surnames was changed, this method will be called, to persist the change.
-     *
-     * @param event Event including the changed object and the change.
-     */
-    @FXML
-    private void handleEditSurname(TableColumn.CellEditEvent<Nurse, String> event) {
-        if (!Session.isAdmin()) {
-            tableView.refresh();  // reset change visually
-            showNotAuthorizedAlert();
-            return;
-        }
-
-        Nurse nurse = event.getRowValue();
-        nurse.setSurname(event.getNewValue());
-
-        // Set changedBy to current user
-        setChangedBy();
-
-        try {
-            dao.update(nurse);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
     @FXML
     private void handleEditFirstname(TableColumn.CellEditEvent<Nurse, String> event) {
         if (!Session.isAdmin()) {
@@ -217,6 +192,7 @@ public class AllCaregiverController {
             e.printStackTrace();
         }
     }
+
     @FXML
     private void handleEditphoneNumber(TableColumn.CellEditEvent<Nurse, String> event) {
         if (!Session.isAdmin()) {
@@ -296,7 +272,7 @@ public class AllCaregiverController {
             return;
         }
         if (selectedItem != null) {
-          selectedItem.markForDeletion();
+            selectedItem.markForDeletion();
             String currentUser = Session.getCurrentUser().getUsername();
             Nurse nurse = tableView.getSelectionModel().getSelectedItem();
             nurse.setDeletedBy(currentUser);
@@ -397,11 +373,13 @@ public class AllCaregiverController {
             e.printStackTrace();
         }
     }
-    private void setChangedBy(){
+
+    private void setChangedBy() {
         Nurse nurse = tableView.getSelectionModel().getSelectedItem();
         nurse.setChangedBy(Session.getCurrentUser().getUsername());
     }
-    private void setDeletedBy(){
+
+    private void setDeletedBy() {
         Nurse nurse = tableView.getSelectionModel().getSelectedItem();
         nurse.setDeletedBy(Session.getCurrentUser().getUsername());
     }
