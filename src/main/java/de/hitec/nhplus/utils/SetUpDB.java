@@ -107,9 +107,9 @@ public class SetUpDB {
 
         try (Statement statement = connection.createStatement()) {
             statement.execute(SQL);
-            System.out.println("Tabelle 'treatment' erfolgreich erstellt.");
+
         } catch (SQLException exception) {
-            System.out.println(exception.getMessage());
+
         }
     }
 
@@ -127,7 +127,7 @@ public class SetUpDB {
         try (Statement statement = connection.createStatement()) {
             statement.execute(SQL);
         } catch (SQLException exception) {
-            System.out.println("Error creating table 'user': " + exception.getMessage());
+
         }
     }
 
@@ -223,6 +223,6 @@ public class SetUpDB {
 
     public static void main(String[] args) {
         SetUpDB.setUpDb();
-        System.out.println("ausgeführt");
+
     }
 }

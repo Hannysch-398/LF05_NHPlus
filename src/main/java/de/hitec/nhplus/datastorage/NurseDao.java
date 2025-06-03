@@ -308,7 +308,7 @@ public class NurseDao extends DaoImp<Nurse> {
             stmt.setString(2, Nurse.STATUS_ACTIVE);
 
             int deleted = stmt.executeUpdate();
-            System.out.println("Anzahl gelöschter inaktiver Pflegekräfte mit abgelaufenem Löschdatum: " + deleted);
+
         }
     }
 

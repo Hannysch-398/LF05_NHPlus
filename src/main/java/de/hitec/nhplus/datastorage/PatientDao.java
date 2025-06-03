@@ -47,17 +47,17 @@ public class PatientDao extends DaoImp<Patient> {
             preparedStatement.setString(6, patient.getStatus());
 
             if (patient.getDeletionDate() != null) {
-                System.out.println("insert spalte 7");
+
                 preparedStatement.setDate(7, java.sql.Date.valueOf(patient.getDeletionDate()));
             } else {
-                System.out.println("insert spalte 71");
+
                 preparedStatement.setNull(7, java.sql.Types.DATE);
             }
             if (patient.getArchiveDate() != null) {
-                System.out.println("insert spalte 8");
+
                 preparedStatement.setDate(8, java.sql.Date.valueOf(patient.getArchiveDate()));
             } else {
-                System.out.println("insert spalte 81");
+
                 preparedStatement.setNull(8, java.sql.Types.DATE);
             }
             preparedStatement.setString(9, patient.getChangedBy());
@@ -316,7 +316,7 @@ public class PatientDao extends DaoImp<Patient> {
             stmt.setString(2, Patient.STATUS_ACTIVE);
 
             int deleted = stmt.executeUpdate();
-            System.out.println("Anzahl gelöschter inaktiver Patienten mit abgelaufenem Löschdatum: " + deleted);
+
         }
     }
 
