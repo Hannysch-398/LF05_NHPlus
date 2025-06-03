@@ -32,8 +32,10 @@ public class Nurse extends Person {
      * @param surname     Last name of the nurse.
      * @param phoneNumber phone Number of the nurse.
      */
+
     public Nurse(String firstName, String surname, String phoneNumber, String status,
                  LocalDate deletionDate, LocalDate archiveDate, String changedBy, String deletedBy) {
+
         super(firstName, surname);
         this.nid = new SimpleLongProperty(); // leer – DB vergibt ID später
         this.phoneNumber = new SimpleStringProperty(phoneNumber);
@@ -53,8 +55,10 @@ public class Nurse extends Person {
      * @param surname     Last name of the nurse.
      * @param phoneNumber phoneNumber of the nurse
      */
+
     public Nurse(long nid, String firstName, String surname, String phoneNumber, String status,
                  LocalDate deletionDate, LocalDate archiveDate, String changedBy, String deletedBy) {
+
         super(firstName, surname);
         this.nid = new SimpleLongProperty(nid);
         this.phoneNumber = new SimpleStringProperty(phoneNumber);
@@ -64,7 +68,6 @@ public class Nurse extends Person {
         this.changedBy.set(changedBy);
         this.deletedBy.set(deletedBy);
     }
-
 
 
     public long getNid() {
@@ -139,11 +142,17 @@ public class Nurse extends Person {
     public String toString() {
         return "Pfleger/in" + "\nNID: " + this.nid + "\nFirstname: " + this.getFirstName() + "\nSurname: " +
                 this.getSurname() + "\nPhoneNumber: " + this.phoneNumber + "\nStatus: " + this.status +
+
                 "\nDatum gelöscht: " + this.deletionDate +"\nDatum archiviert: " + this.archiveDate +"\n" +"\nGeändert von: " + this.changedBy +
                 "\nGelöscht von: " + this.deletedBy + "\n";
+
     }
 
-
+    /**
+     * Marks the nurse for future deletion by setting the archive date to the current date
+     * and the deletion date to 10 years from now. Optionally sets the status to inactive.
+     * This method is typically used for soft-deletion workflows.
+     */
     public void markForDeletion() {
         this.status.set(STATUS_INACTIVE); // optional
         this.archiveDate.set(LocalDate.now());

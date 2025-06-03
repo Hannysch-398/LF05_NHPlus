@@ -188,7 +188,11 @@ public class Treatment {
                 this.remarks + "\nNurse" + "\nNID:" + this.nid  + "\nStatus: " + this.status +
                 "\nDatum gelöscht: " + this.deletionDate +"\nDatum archiviert: " + this.archiveDate + "\n";
     }
-
+    /**
+     * Marks the treatment for future deletion by setting the archive date to the current date
+     * and the deletion date to 10 years from now. Optionally sets the status to inactive.
+     * This method is typically used for soft-deletion workflows.
+     */
     public void setNid(long nid) {
         this.nid = nid;
     }

@@ -3,3 +3,8 @@
     -fx-border-color: rgb(142, 142, 142);
 }
 
+.button{
+    -fx-background-color: white;
+    -fx-text-fill: black;
+    -fx-border-color: black;
+}

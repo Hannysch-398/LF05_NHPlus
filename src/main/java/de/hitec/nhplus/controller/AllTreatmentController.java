@@ -88,6 +88,13 @@ public class AllTreatmentController {
                         newTreatment == null));
 
         this.createComboBoxData();
+
+        this.tableView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && tableView.getSelectionModel().getSelectedItem() != null) {
+                Treatment treatment = tableView.getSelectionModel().getSelectedItem();
+                treatmentWindow(treatment);
+            }
+        });
     }
 
     public void readAllAndShowInTableView() {
@@ -135,21 +142,34 @@ public class AllTreatmentController {
         this.treatments.clear();
         this.dao = DaoFactory.getDaoFactory().createTreatmentDao();
 
-        if (selectedPatient.equals("alle")) {
-            try {
-                this.treatments.addAll(this.dao.readAll());
-            } catch (SQLException exception) {
-                exception.printStackTrace();
+        try {
+            List<Treatment> filteredTreatments;
+            if (selectedPatient.equals("alle")) {
+                filteredTreatments = this.dao.readAll();
+            } else {
+                Patient patient = searchInList(selectedPatient);
+                if (patient != null) {
+                    filteredTreatments = this.dao.readTreatmentsByPid(patient.getPid());
+                } else {
+                    return;
+                }
             }
-        }
 
-        Patient patient = searchInList(selectedPatient);
-        if (patient != null) {
-            try {
-                this.treatments.addAll(this.dao.readTreatmentsByPid(patient.getPid()));
-            } catch (SQLException exception) {
-                exception.printStackTrace();
+            // Pflegekraftinformationen für gefilterte Behandlungen aktualisieren
+            NurseDao nurseDao = DaoFactory.getDaoFactory().createNurseDAO();
+            for (Treatment treatment : filteredTreatments) {
+                Nurse nurse = nurseDao.read((int) treatment.getNid());
+                if (nurse != null) {
+                    String nurseName = nurse.getSurname() + ", " + nurse.getFirstName();
+                    treatment.setNurseName(nurseName);
+                } else {
+                    treatment.setNurseName("Unbekannt");
+                }
             }
+
+            this.treatments.addAll(filteredTreatments);
+        } catch (SQLException exception) {
+            exception.printStackTrace();
         }
     }
 

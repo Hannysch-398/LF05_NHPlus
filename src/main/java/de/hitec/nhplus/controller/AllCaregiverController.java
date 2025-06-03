@@ -66,50 +66,97 @@ public class AllCaregiverController {
      * configured.
      */
     public void initialize() throws SQLException {
-        System.out.println("initialize aufgerufen");
+        this.dao = DaoFactory.getDaoFactory().createNurseDAO();
         this.readAllAndShowInTableView();
-
-
-        // CellValueFactory to show property values in TableView
-        this.columnFirstName.setCellValueFactory(new PropertyValueFactory<>("firstName"));
-        // CellFactory to write property values from with in the TableView
-        this.columnFirstName.setCellFactory(TextFieldTableCell.forTableColumn());
-
-        this.columnSurname.setCellValueFactory(new PropertyValueFactory<>("surname"));
-        this.columnSurname.setCellFactory(TextFieldTableCell.forTableColumn());
-
-        this.columnPhoneNumber.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
-        this.columnPhoneNumber.setCellFactory(TextFieldTableCell.forTableColumn());
 
         this.columnNid.setCellValueFactory(new PropertyValueFactory<>("nid"));
 
+        this.columnFirstName.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        this.columnFirstName.setCellFactory(TextFieldTableCell.forTableColumn());
+        this.columnFirstName.setOnEditCommit(event -> {
+            if (!Session.isAdmin()) {
+                // Änderung zurücksetzen (optional)
+                tableView.refresh();  // Zeigt den alten Wert wieder
+                showNotAuthorizedAlert();
+                return;
+            }
+
+            Nurse nurse = event.getRowValue();
+            nurse.setFirstName(event.getNewValue());
+            try {
+                dao.update(nurse);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
 
 
+        this.columnSurname.setCellValueFactory(new PropertyValueFactory<>("surname"));
+        this.columnSurname.setCellFactory(TextFieldTableCell.forTableColumn());
+        this.columnSurname.setOnEditCommit(event -> {
+            if (!Session.isAdmin()) {
+                // Änderung zurücksetzen (optional)
+                tableView.refresh();  // Zeigt den alten Wert wieder
+                showNotAuthorizedAlert();
+                return;
+            }
+            Nurse nurse = event.getRowValue();
+            nurse.setSurname(event.getNewValue());
+            try {
+                dao.update(nurse);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
 
-        //Anzeigen der Daten
+        this.columnPhoneNumber.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
+        this.columnPhoneNumber.setCellFactory(TextFieldTableCell.forTableColumn());
+        this.columnPhoneNumber.setOnEditCommit(event -> {
+            if (!Session.isAdmin()) {
+                // Änderung zurücksetzen (optional)
+                tableView.refresh();  // Zeigt den alten Wert wieder
+                showNotAuthorizedAlert();
+                return;
+            }
+            Nurse nurse = event.getRowValue();
+            nurse.setPhoneNumber(event.getNewValue());
+            try {
+                dao.update(nurse);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+
         this.tableView.setItems(this.nurses);
 
         this.buttonDelete.setDisable(true);
-        this.tableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Nurse>() {
-            @Override
-            public void changed(ObservableValue<? extends Nurse> observableValue, Nurse oldNurse, Nurse newNurse) {
-                //Prüfen ob als admin eingeloggt wurde
-                if (Session.isAdmin()){
-                AllCaregiverController.this.buttonDelete.setDisable(newNurse == null);}
+        this.tableView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldNurse, newNurse) -> {
+            if (Session.isAdmin()) {
+                this.buttonDelete.setDisable(newNurse == null);
             }
         });
 
         this.buttonAdd.setDisable(true);
-        if (Session.isAdmin()){
-        ChangeListener<String> inputNewNurseListener =
-                (observableValue, oldText, newText) -> AllCaregiverController.this.buttonAdd.setDisable(
-                        !AllCaregiverController.this.areInputDataValid());
-        this.textFieldSurname.textProperty().addListener(inputNewNurseListener);
-        this.textFieldFirstName.textProperty().addListener(inputNewNurseListener);
-        this.textFieldPhoneNumber.textProperty().addListener(inputNewNurseListener);}
-        this.buttonEdit.setDisable(!Session.isAdmin());
 
+        if (Session.isAdmin()) {
+            ChangeListener<String> inputNewNurseListener = (observable, oldText, newText) ->
+                    this.buttonAdd.setDisable(!this.areInputDataValid());
+
+            this.textFieldSurname.textProperty().addListener(inputNewNurseListener);
+            this.textFieldFirstName.textProperty().addListener(inputNewNurseListener);
+            this.textFieldPhoneNumber.textProperty().addListener(inputNewNurseListener);
+        }
+
+        this.buttonEdit.setDisable(!Session.isAdmin());
     }
+    private void showNotAuthorizedAlert() {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Keine Berechtigung");
+        alert.setHeaderText("Aktion nicht erlaubt");
+        alert.setContentText("Nur Administratoren dürfen Pflegekräfte bearbeiten.");
+        alert.showAndWait();
+    }
+
 
     /**
      * When a cell of the column with first names was changed, this method will be called, to persist the change.
