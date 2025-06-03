@@ -82,5 +82,5 @@ Vorgehensweise gewählt.
 
 ### Logindaten
 
-admin: u.mann - G7r#vB!92pLz@Xm3
-reguläre Pflegekraft: a.suarez - qW8^zT$5nMv!Ka#1
+- admin: u.mann - G7r#vB!92pLz@Xm3
+- reguläre Pflegekraft: a.suarez - qW8^zT$5nMv!Ka#1
